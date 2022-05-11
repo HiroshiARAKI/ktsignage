@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../font/OpenSans.ttf');
+}
+
+.label {
+    -fx-font-family: 'OpenSans';
+    -fx-font-size: 20;
+}
+
+.button .text {
+    -fx-font-family: 'OpenSans';
+}
