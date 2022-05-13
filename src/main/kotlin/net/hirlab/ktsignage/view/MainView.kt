@@ -4,6 +4,9 @@ import javafx.scene.Group
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.Priority
 import javafx.stage.StageStyle
+import kotlinx.coroutines.launch
+import net.hirlab.ktsignage.MyApp
+import net.hirlab.ktsignage.model.dao.PreferencesDao
 import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.view.component.BackGroundImageView
@@ -19,6 +22,8 @@ class MainView : BaseView(TITLE) {
     override val root = Group()
     private val dateView: DateView by inject()
     private val backGroundImageView: BackGroundImageView by inject()
+
+    private val preferencesDao: PreferencesDao by di()
 
     private val windowWidthChangeListener = ChangeListener<Number> { obs, oldVal, newVal ->
         container.prefWidth = newVal.toDouble()
@@ -42,6 +47,8 @@ class MainView : BaseView(TITLE) {
     private var mousePointMemory: MousePoint? = null
 
     init {
+        MyApp.applicationScope.launch { preferencesDao.initialize() }
+
         root += backGroundImageView.root
         root += container
         root.setOnMouseClicked  {

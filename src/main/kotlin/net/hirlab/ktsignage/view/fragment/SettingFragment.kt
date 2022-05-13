@@ -6,6 +6,7 @@ import javafx.scene.Group
 import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.util.Logger
+import net.hirlab.ktsignage.viewmodel.fragment.SettingViewModel
 import tornadofx.*
 import kotlin.reflect.KClass
 
@@ -14,6 +15,8 @@ import kotlin.reflect.KClass
  */
 class SettingFragment : Fragment(TITLE) {
     override val root = Group()
+
+    private val viewModel: SettingViewModel by inject()
 
     private val settingList = vbox {
         addClass(Theme.settingItemContainer)
@@ -45,6 +48,7 @@ class SettingFragment : Fragment(TITLE) {
             settingPropertyMap[setting::class]!!.entries.forEach { (item, property) ->
                 property.value = item.getLabel(property.name == setting.itemName)
             }
+            viewModel.saveSetting(setting)
         }
     }
 

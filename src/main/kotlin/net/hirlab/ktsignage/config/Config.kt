@@ -52,6 +52,8 @@ object Config {
 
     fun removeListener(listener: Listener) = synchronized(lock) { listeners.remove(listener) }
 
+    fun getLog() = "Config: DateFormat=$dateFormat, Lang=$lang, Location=$location"
+
     /**
      * Listener for setting changes.
      */

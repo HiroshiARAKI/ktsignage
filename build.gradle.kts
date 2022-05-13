@@ -28,6 +28,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:$coroutinesVersion")
     implementation("com.google.guava:guava:31.1-jre")
+    implementation("com.google.inject:guice:5.1.0")
     implementation("com.sun.activation:javax.activation:1.2.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("org.json:json:20180813")

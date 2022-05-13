@@ -1,5 +1,6 @@
 package net.hirlab.ktsignage.config
 
+import java.lang.IllegalArgumentException
 import java.util.Locale
 import kotlin.reflect.KClass
 
@@ -26,6 +27,11 @@ interface SettingItem {
      * This will notify this change to [Config.Listener]s.
      */
     fun select()
+
+    interface SettingItemCompanion {
+        val DEFAULT: SettingItem
+        fun valueOfOrDefault(name: String): SettingItem
+    }
 }
 
 /**
@@ -37,9 +43,15 @@ enum class Language(override val itemName: String, val code: String, override va
 
     override fun select() { Config.lang = this }
 
-    companion object {
-        val DEFAULT = EN
+    companion object : SettingItem.SettingItemCompanion {
+        override val DEFAULT = EN
         val map = values().associateBy({ it.code }, { it.value })
+
+        override fun valueOfOrDefault(name: String) = try {
+            valueOf(name)
+        } catch (e: IllegalArgumentException) {
+            DEFAULT
+        }
     }
 }
 
@@ -51,8 +63,14 @@ enum class Location(override val itemName: String, override val value: String) :
 
     override fun select() { Config.location = this }
 
-    companion object {
-        val DEFAULT = YOKOHAMA
+    companion object : SettingItem.SettingItemCompanion{
+        override val DEFAULT = YOKOHAMA
+
+        override fun valueOfOrDefault(name: String) = try {
+            valueOf(name)
+        } catch (e: IllegalArgumentException) {
+            DEFAULT
+        }
     }
 }
 
@@ -69,7 +87,13 @@ enum class DateFormat(override val itemName: String, override val value: String)
 
     override fun select() { Config.dateFormat = this }
 
-    companion object {
-        val DEFAULT = JIS2
+    companion object : SettingItem.SettingItemCompanion{
+        override val DEFAULT = JIS2
+
+        override fun valueOfOrDefault(name: String) = try {
+            valueOf(name)
+        } catch (e: IllegalArgumentException) {
+            DEFAULT
+        }
     }
 }
