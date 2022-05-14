@@ -37,16 +37,15 @@ class AppPreferencesDao : PreferencesDao {
                 Setting.dateFormat = getNode(DATE_FORMAT, preferences)?.let {
                     DateFormat.valueOfOrDefault(it.textContent)
                 } ?: DateFormat.DEFAULT
-
                 Setting.lang = getNode(LANGUAGE, preferences)?.let {
                     Language.valueOfOrDefault(it.textContent)
                 } ?: Language.DEFAULT
-
                 Setting.location = getNode(LOCATION, preferences)?.let {
                     Location.valueOfOrDefault(it.textContent)
                 } ?: Location.DEFAULT
-
                 Setting.openWeatherAPIKey = getNode(OPEN_WEATHER_API_KEY, preferences)?.textContent ?: ""
+                Setting.imageDirectory = getNode(IMAGE_DIRECTORY, preferences)?.textContent
+                    ?: ResourceAccessor.imagePath
             }
             Logger.d("$TAG.initialize: loaded preferences (${Setting.getLog()})")
         } else {
@@ -55,10 +54,16 @@ class AppPreferencesDao : PreferencesDao {
     }
 
     override suspend fun saveDateFormat(dateFormat: DateFormat) { saveSettings(DATE_FORMAT, dateFormat.name) }
+
     override suspend fun saveLanguage(language: Language) { saveSettings(LANGUAGE, language.name) }
+
     override suspend fun saveLocation(location: Location) { saveSettings(LOCATION, location.name) }
+
     override suspend fun saveOpenWeatherAPIKey(apiKey: OpenWeatherApiKey) {
         saveSettings(OPEN_WEATHER_API_KEY, apiKey.value)
+    }
+    override suspend fun saveImageDirectory(directory: ImageDirectory) {
+        saveSettings(IMAGE_DIRECTORY, directory.value)
     }
 
     private suspend fun saveSettings(target: String, settingItem: String) = withContext(Dispatchers.IO) {
@@ -76,6 +81,7 @@ class AppPreferencesDao : PreferencesDao {
             updateOrAppendNode(LANGUAGE, preferences, Setting.lang.name)
             updateOrAppendNode(LOCATION, preferences, Setting.location.name)
             updateOrAppendNode(OPEN_WEATHER_API_KEY, preferences, Setting.openWeatherAPIKey)
+            updateOrAppendNode(IMAGE_DIRECTORY, preferences, Setting.imageDirectory)
         }
         save(preferences)
     }
@@ -127,5 +133,6 @@ class AppPreferencesDao : PreferencesDao {
         private const val LANGUAGE = "language"
         private const val LOCATION = "location"
         private const val OPEN_WEATHER_API_KEY = "open_weather_api_key"
+        private const val IMAGE_DIRECTORY = "image_directory"
     }
 }

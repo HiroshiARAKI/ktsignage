@@ -52,6 +52,14 @@ object Setting {
             Logger.d("$TAG.openWeatherAPIKey is changed to $value")
         }
 
+    var imageDirectory = ""
+        set(value) {
+            field = value
+            ImageDirectory.setPath(value)
+            synchronized(lock) { listeners.forEach { it.onImageDirectoryChanged(ImageDirectory) } }
+            Logger.d("$TAG.imageDirectory is changed to $value")
+        }
+
     private val listeners = mutableSetOf<Listener>()
 
     fun addListener(listener: Listener) = synchronized(lock) { listeners.add(listener) }
@@ -64,9 +72,10 @@ object Setting {
      * Listener for setting changes.
      */
     interface Listener {
-        fun onLanguageChanged(language: Language)
-        fun onLocationChanged(location: Location)
-        fun onDateFormatChanged(dateFormat: DateFormat)
-        fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey)
+        fun onLanguageChanged(language: Language) { }
+        fun onLocationChanged(location: Location) { }
+        fun onDateFormatChanged(dateFormat: DateFormat) { }
+        fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { }
+        fun onImageDirectoryChanged(directory: ImageDirectory) { }
     }
 }

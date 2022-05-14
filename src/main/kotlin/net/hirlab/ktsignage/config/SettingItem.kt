@@ -10,6 +10,7 @@ enum class Settings(val itemName: String, val item: KClass<out SettingItem>) {
     LOCATION("Location", Location::class),
     DATE_FORMAT("Date format", DateFormat::class),
     OPEN_WEATHER_API_KEY("OpenWeather API Key", OpenWeatherApiKey::class),
+    IMAGE_DIRECTORY("Image directory", ImageDirectory::class),
 }
 
 /**

@@ -54,6 +54,10 @@ class DateViewModel(
                 dbAccessQueue.send { loadCurrentWeather() }
             }
         }
+
+        override fun onImageDirectoryChanged(directory: ImageDirectory) {
+            // do nothing
+        }
     }
 
     /**

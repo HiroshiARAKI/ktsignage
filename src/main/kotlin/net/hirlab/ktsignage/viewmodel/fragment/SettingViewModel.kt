@@ -33,6 +33,7 @@ class SettingViewModel : ViewModel() {
                 is Language -> preferencesDao.saveLanguage(settingItem)
                 is Location -> preferencesDao.saveLocation(settingItem)
                 is OpenWeatherApiKey -> preferencesDao.saveOpenWeatherAPIKey(settingItem)
+                is ImageDirectory -> preferencesDao.saveImageDirectory(settingItem)
             }
         }
     }
@@ -42,11 +43,28 @@ class SettingViewModel : ViewModel() {
      * The delay is time offset to avoid unnecessary changes and file accesses.
      */
     fun setOpenWeatherAPIKeyAfterDelay(key: String, delayMillis: Long = 1000) {
+        runAfterDelay(delayMillis) {
+            Setting.openWeatherAPIKey = key
+            Logger.d("setOpenWeatherAPIKeyAfterDelay(): save API Key ($key)")
+        }
+    }
+
+    /**
+     * Sets image directory path to [Setting] after [delayMillis] ms and will save it to preferences file.
+     * The delay is time offset to avoid unnecessary changes and file accesses.
+     */
+    fun setImageDirectoryAfterDelay(path: String, delayMillis: Long = 1000) {
+        runAfterDelay(delayMillis) {
+            Setting.imageDirectory = path
+            Logger.d("setImageDirectoryAfterDelay(): save image directory ($path)")
+        }
+    }
+
+    private fun runAfterDelay(delayMillis: Long = 1000, func: () -> Unit) {
         MyApp.applicationScope.launch {
             settingQueue.send {
                 delay(delayMillis)
-                Setting.openWeatherAPIKey = key
-                Logger.d("setOpenWeatherAPIKeyAfterDelay(): save API Key ($key)")
+                func()
             }
         }
     }

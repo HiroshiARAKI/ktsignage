@@ -1,11 +1,13 @@
 package net.hirlab.ktsignage.viewmodel.component
 
 import com.google.common.annotations.VisibleForTesting
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.image.Image
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import net.hirlab.ktsignage.ResourceAccessor
+import net.hirlab.ktsignage.config.ImageDirectory
+import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.data.RingBuffer
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.util.image
@@ -25,12 +27,32 @@ class BackgroundImageViewModel : ViewModel() {
     private var imageSwitchingJob: Job? = null
     private var currentPointer = 0
 
+    private val settingListener = object : Setting.Listener {
+        override fun onImageDirectoryChanged(directory: ImageDirectory) {
+            initializeImages()
+        }
+    }
+
+    init {
+        Setting.addListener(settingListener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Setting.removeListener(settingListener)
+    }
+
     /**
      * Initial setup.
      */
     fun initializeImages() {
         viewModelScope.launch(Dispatchers.IO) {
-            imageBuffer = RingBuffer(getImageFilePaths())
+            val imagePaths = getImageFilePaths()
+            if (imagePaths.isEmpty()) {
+                Logger.w("initializeImages(): ${Setting.imageDirectory} has no images.")
+                return@launch
+            }
+            imageBuffer = RingBuffer(imagePaths)
             Logger.d("loadImages(): load paths ... $imageBuffer")
             currentPointer = 0
             loadImage()
@@ -57,6 +79,7 @@ class BackgroundImageViewModel : ViewModel() {
     fun prevImage() {
         if (!::prevImageCache.isInitialized) return
         viewModelScope.launch {
+            currentImage.value = prevImageCache
             imageBuffer.movePrevious()
             loadImage(needsCurrentImageUpdate = false)
             startImageSwitching()
@@ -87,11 +110,12 @@ class BackgroundImageViewModel : ViewModel() {
     }
 
     companion object {
+        // TODO: Duration of image transition should be settable by users (#3)
         private val SLIDESHOW_DELAY_TIME_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
         @VisibleForTesting
         fun getImageFilePaths(): List<String> {
-            return File(ResourceAccessor.imagePath).walk()
+            return File(Setting.imageDirectory).walk()
                 .toList()
                 .mapNotNull { if (it.isImageFile()) it.toURI().toURL().toExternalForm() else null }
         }

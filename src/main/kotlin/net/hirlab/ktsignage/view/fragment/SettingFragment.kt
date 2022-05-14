@@ -53,6 +53,7 @@ class SettingFragment : Fragment(TITLE) {
         override fun onLocationChanged(location: Location) { updateLabelOf(location)}
         override fun onDateFormatChanged(dateFormat: DateFormat) { updateLabelOf(dateFormat) }
         override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { viewModel.saveSetting(apiKey) }
+        override fun onImageDirectoryChanged(directory: ImageDirectory) { viewModel.saveSetting(directory) }
 
         private fun updateLabelOf(setting: SettingItem) {
             settingPropertyMap[setting::class]!!.entries.forEach { (item, property) ->
@@ -91,6 +92,10 @@ class SettingFragment : Fragment(TITLE) {
                 DateFormat::class -> DateFormat.values()
                 OpenWeatherApiKey::class -> {
                     openWithOpenWeatherAPISetting()
+                    null
+                }
+                ImageDirectory::class -> {
+                    openImageDirectorySetting()
                     null
                 }
                 else -> null
@@ -145,6 +150,27 @@ class SettingFragment : Fragment(TITLE) {
                         action { hostServices.showDocument("https://openweathermap.org/") }
                     }
                     text("about OpenWeather API.")
+                }
+            }
+        )
+    }
+
+    private fun openImageDirectorySetting() {
+        settingDetail.replaceChildren(
+            vbox {
+                addClass(Theme.settingWeatherStatus)
+                label("Image directory:")
+                button {
+                    text = Setting.imageDirectory
+                    action {
+                        val dir = chooseDirectory("Select Image Directory")
+                        if (dir != null)
+                            text = dir.path
+                    }
+                    textProperty().onChange {
+                        if (!it.isNullOrBlank())
+                            viewModel.setImageDirectoryAfterDelay(it)
+                    }
                 }
             }
         )
