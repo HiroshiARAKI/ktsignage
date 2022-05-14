@@ -37,6 +37,7 @@ class DateViewModel : ViewModel() {
             viewModelScope.launch {
                 dbAccessQueue.send { loadCurrentWeather() }
             }
+            formatter = getDateTimeFormatter()
         }
 
         override fun onLocationChanged(location: Location) {
