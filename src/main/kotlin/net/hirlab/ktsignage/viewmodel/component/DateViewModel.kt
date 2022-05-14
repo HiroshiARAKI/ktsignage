@@ -7,10 +7,7 @@ import javafx.scene.image.Image
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import net.hirlab.ktsignage.config.Config
-import net.hirlab.ktsignage.config.DateFormat
-import net.hirlab.ktsignage.config.Language
-import net.hirlab.ktsignage.config.Location
+import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.model.gateway.WeatherRepository
 import net.hirlab.ktsignage.util.Logger
@@ -34,7 +31,7 @@ class DateViewModel(
 
     private var formatter = getDateTimeFormatter()
 
-    private val configListener = object : Config.Listener {
+    private val configListener = object : Setting.Listener {
         override fun onLanguageChanged(language: Language) {
             viewModelScope.launch {
                 dbAccessQueue.send { loadCurrentWeather() }
@@ -51,6 +48,12 @@ class DateViewModel(
         override fun onDateFormatChanged(dateFormat: DateFormat) {
             formatter = getDateTimeFormatter()
         }
+
+        override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) {
+            viewModelScope.launch {
+                dbAccessQueue.send { loadCurrentWeather() }
+            }
+        }
     }
 
     /**
@@ -63,7 +66,7 @@ class DateViewModel(
     }
 
     init {
-        Config.addListener(configListener)
+        Setting.addListener(configListener)
         viewModelScope.launch {
             runWithDelay(TIMER_DELAY_MILLIS) {
                 ZonedDateTime.now(ZoneId.systemDefault()).let {
@@ -80,7 +83,7 @@ class DateViewModel(
 
     override fun onDestroy() {
         super.onDestroy()
-        Config.removeListener(configListener)
+        Setting.removeListener(configListener)
     }
 
     private suspend fun loadCurrentWeather() {
@@ -100,6 +103,6 @@ class DateViewModel(
         private val WEATHER_UPDATE_DELAY_MILLIS = TimeUnit.MINUTES.toMillis(5)
 
         private fun Float.toCelsius() = this - 273.15F
-        private fun getDateTimeFormatter() = DateTimeFormatter.ofPattern(Config.dateFormat.value, Config.locale)
+        private fun getDateTimeFormatter() = DateTimeFormatter.ofPattern(Setting.dateFormat.value, Setting.locale)
     }
 }

@@ -9,7 +9,7 @@ import net.hirlab.ktsignage.view.MainView
 import tornadofx.*
 
 class MyApp: App(MainView::class, Theme::class) {
-    private val guice = Guice.createInjector(Module())
+    private val guice = Guice.createInjector(AppModule())
 
     init {
         FX.dicontainer = object : DIContainer {

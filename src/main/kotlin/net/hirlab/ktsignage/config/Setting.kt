@@ -5,9 +5,9 @@ import java.util.*
 import kotlin.reflect.KClass
 
 /**
- * App configurations.
+ * App settings.
  */
-object Config {
+object Setting {
     private val lock = Any()
     private val TAG = this::class.java.simpleName
 
@@ -44,7 +44,13 @@ object Config {
         DateFormat::class to dateFormat
     )
 
-    var WEATHER_API_KEY = "057aff0074ef798e0be84fc10360aacb"
+    var openWeatherAPIKey = ""
+        set(value) {
+            field = value
+            OpenWeatherApiKey.setKey(value)
+            synchronized(lock) { listeners.forEach { it.onOpenWeatherAPIKeyChanged(OpenWeatherApiKey) } }
+            Logger.d("$TAG.openWeatherAPIKey is changed to $value")
+        }
 
     private val listeners = mutableSetOf<Listener>()
 
@@ -61,5 +67,6 @@ object Config {
         fun onLanguageChanged(language: Language)
         fun onLocationChanged(location: Location)
         fun onDateFormatChanged(dateFormat: DateFormat)
+        fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey)
     }
 }

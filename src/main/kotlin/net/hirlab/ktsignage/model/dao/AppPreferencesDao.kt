@@ -22,7 +22,7 @@ import javax.xml.xpath.XPathFactory
  * Data access object for preferences for product.
  */
 @Singleton
-class ProdPreferencesDao : PreferencesDao {
+class AppPreferencesDao : PreferencesDao {
     private val preferencesPath = ResourceAccessor.dataPath + PREFERENCES_XML
     private val preferencesFile: File
         get() = File(preferencesPath)
@@ -33,20 +33,22 @@ class ProdPreferencesDao : PreferencesDao {
         if (preferencesFile.exists()) {
             Logger.d("$TAG.initialize: found preferences (path=$preferencesPath)!.")
             val preferences = getPreferences()
-            XPathFactory.newInstance().newXPath().let { xPath ->
-                Config.dateFormat = xPath.getNode(DATE_FORMAT, preferences)?.let {
+            xPathScope {
+                Setting.dateFormat = getNode(DATE_FORMAT, preferences)?.let {
                     DateFormat.valueOfOrDefault(it.textContent)
                 } ?: DateFormat.DEFAULT
 
-                Config.lang = xPath.getNode(LANGUAGE, preferences)?.let {
+                Setting.lang = getNode(LANGUAGE, preferences)?.let {
                     Language.valueOfOrDefault(it.textContent)
                 } ?: Language.DEFAULT
 
-                Config.location = xPath.getNode(LOCATION, preferences)?.let {
+                Setting.location = getNode(LOCATION, preferences)?.let {
                     Location.valueOfOrDefault(it.textContent)
                 } ?: Location.DEFAULT
+
+                Setting.openWeatherAPIKey = getNode(OPEN_WEATHER_API_KEY, preferences)?.textContent ?: ""
             }
-            Logger.d("$TAG.initialize: loaded preferences (${Config.getLog()})")
+            Logger.d("$TAG.initialize: loaded preferences (${Setting.getLog()})")
         } else {
             saveSettingsFromCache(true)
         }
@@ -55,6 +57,9 @@ class ProdPreferencesDao : PreferencesDao {
     override suspend fun saveDateFormat(dateFormat: DateFormat) { saveSettings(DATE_FORMAT, dateFormat.name) }
     override suspend fun saveLanguage(language: Language) { saveSettings(LANGUAGE, language.name) }
     override suspend fun saveLocation(location: Location) { saveSettings(LOCATION, location.name) }
+    override suspend fun saveOpenWeatherAPIKey(apiKey: OpenWeatherApiKey) {
+        saveSettings(OPEN_WEATHER_API_KEY, apiKey.value)
+    }
 
     private suspend fun saveSettings(target: String, settingItem: String) = withContext(Dispatchers.IO) {
         val preferences = if (preferencesFile.exists()) getPreferences() else newPreferences()
@@ -67,9 +72,10 @@ class ProdPreferencesDao : PreferencesDao {
     private suspend fun saveSettingsFromCache(needsCreate: Boolean) = withContext(Dispatchers.IO) {
         val preferences = if (needsCreate) newPreferences() else getPreferences()
         xPathScope {
-            updateOrAppendNode(DATE_FORMAT, preferences, Config.dateFormat.name)
-            updateOrAppendNode(LANGUAGE, preferences, Config.lang.name)
-            updateOrAppendNode(LOCATION, preferences, Config.location.name)
+            updateOrAppendNode(DATE_FORMAT, preferences, Setting.dateFormat.name)
+            updateOrAppendNode(LANGUAGE, preferences, Setting.lang.name)
+            updateOrAppendNode(LOCATION, preferences, Setting.location.name)
+            updateOrAppendNode(OPEN_WEATHER_API_KEY, preferences, Setting.openWeatherAPIKey)
         }
         save(preferences)
     }
@@ -113,12 +119,13 @@ class ProdPreferencesDao : PreferencesDao {
     }
 
     companion object {
-        private val TAG = ProdPreferencesDao::class.java.simpleName
+        private val TAG = AppPreferencesDao::class.java.simpleName
 
         private const val PREFERENCES_XML = "preferences.xml"
         private const val PREFERENCES = "preferences"
         private const val DATE_FORMAT = "dateformat"
         private const val LANGUAGE = "language"
         private const val LOCATION = "location"
+        private const val OPEN_WEATHER_API_KEY = "open_weather_api_key"
     }
 }

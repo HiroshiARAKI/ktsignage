@@ -25,11 +25,11 @@ class MainView : BaseView(TITLE) {
 
     private val preferencesDao: PreferencesDao by di()
 
-    private val windowWidthChangeListener = ChangeListener<Number> { obs, oldVal, newVal ->
+    private val windowWidthChangeListener = ChangeListener<Number> { _, _, newVal ->
         container.prefWidth = newVal.toDouble()
     }
 
-    private val windowHeightChangeListener = ChangeListener<Number> { obs, oldVal, newVal ->
+    private val windowHeightChangeListener = ChangeListener<Number> { _, _, newVal ->
         container.prefHeight = newVal.toDouble()
         backGroundImageView.view.prefHeight(newVal.toDouble())
     }

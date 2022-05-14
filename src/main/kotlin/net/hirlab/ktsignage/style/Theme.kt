@@ -12,6 +12,7 @@ import tornadofx.px
  */
 class Theme : Stylesheet() {
     init {
+        // TODO: Separate StyleSheets on each views (#1)
         base {
             fontSize = FONT_SIZE
             padding = box(5.px)
@@ -74,7 +75,7 @@ class Theme : Stylesheet() {
             prefWidth = SETTING_FRAGMENT_WIDTH / 2
         }
 
-        Companion.settingDetail {
+        settingDetail {
             padding = box(5.px)
             borderColor += box(
                 top = ColorConstants.TRANSPARENT,
@@ -85,6 +86,10 @@ class Theme : Stylesheet() {
             hover {
                 opacity = 0.7
             }
+        }
+
+        settingWeatherStatus {
+            padding = box(5.px, 0.px)
         }
 
         marginLeftRight {
@@ -111,6 +116,7 @@ class Theme : Stylesheet() {
         val settingItem by cssclass()
         val settingDetailContainer by cssclass()
         val settingDetail by cssclass()
+        val settingWeatherStatus by cssclass()
 
         val marginLeftRight by cssclass()
     }
