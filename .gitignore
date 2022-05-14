@@ -236,4 +236,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # Kt signange
-/src/main/resources/image/
+# /src/main/resources/image/
