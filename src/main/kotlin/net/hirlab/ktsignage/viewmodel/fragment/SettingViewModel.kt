@@ -53,7 +53,7 @@ class SettingViewModel : ViewModel() {
      * Sets image directory path to [Setting] after [delayMillis] ms and will save it to preferences file.
      * The delay is time offset to avoid unnecessary changes and file accesses.
      */
-    fun setImageDirectoryAfterDelay(path: String, delayMillis: Long = 1000) {
+    fun setImageDirectoryAfterDelay(path: String, delayMillis: Long = 0) {
         runAfterDelay(delayMillis) {
             Setting.imageDirectory = path
             Logger.d("setImageDirectoryAfterDelay(): save image directory ($path)")

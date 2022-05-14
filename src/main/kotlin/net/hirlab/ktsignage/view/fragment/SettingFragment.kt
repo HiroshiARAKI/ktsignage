@@ -14,6 +14,7 @@ import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.viewmodel.fragment.SettingViewModel
 import tornadofx.*
+import java.io.File
 import kotlin.reflect.KClass
 
 /**
@@ -128,9 +129,10 @@ class SettingFragment : Fragment(TITLE) {
     private fun openWithOpenWeatherAPISetting() {
         settingDetail.replaceChildren(
             vbox {
-                addClass(Theme.settingWeatherStatus)
+                addClass(Theme.settingInput)
                 label("Your OpenWeather API Key:")
                 textfield {
+                    addClass(Theme.textSmaller)
                     text = Setting.openWeatherAPIKey
                     textProperty().onChange {
                         if (!it.isNullOrBlank())
@@ -158,14 +160,18 @@ class SettingFragment : Fragment(TITLE) {
     private fun openImageDirectorySetting() {
         settingDetail.replaceChildren(
             vbox {
-                addClass(Theme.settingWeatherStatus)
+                addClass(Theme.settingInput)
                 label("Image directory:")
                 button {
+                    addClass(Theme.textSmaller)
                     text = Setting.imageDirectory
                     action {
-                        val dir = chooseDirectory("Select Image Directory")
-                        if (dir != null)
-                            text = dir.path
+                        chooseDirectory(
+                            initialDirectory = File(Setting.imageDirectory),
+                            owner = primaryStage.owner
+                        )?.let {
+                            text = it.path
+                        }
                     }
                     textProperty().onChange {
                         if (!it.isNullOrBlank())

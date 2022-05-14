@@ -88,7 +88,7 @@ class Theme : Stylesheet() {
             }
         }
 
-        settingWeatherStatus {
+        settingInput {
             padding = box(5.px, 0.px)
             fontSize = 1.0.rem
         }
@@ -99,6 +99,10 @@ class Theme : Stylesheet() {
 
         marginTopBottom {
             padding = box(10.px, 0.px)
+        }
+
+        textSmaller {
+            fontSize = 0.75.rem
         }
     }
 
@@ -120,9 +124,11 @@ class Theme : Stylesheet() {
         val settingItem by cssclass()
         val settingDetailContainer by cssclass()
         val settingDetail by cssclass()
-        val settingWeatherStatus by cssclass()
+        val settingInput by cssclass()
 
         val marginLeftRight by cssclass()
         val marginTopBottom by cssclass()
+
+        val textSmaller by cssclass()
     }
 }
