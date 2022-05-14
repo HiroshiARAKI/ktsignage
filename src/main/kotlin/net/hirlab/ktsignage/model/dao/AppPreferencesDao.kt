@@ -71,7 +71,7 @@ class AppPreferencesDao : PreferencesDao {
         xPathScope {
             updateOrAppendNode(target, preferences, settingItem)
         }
-        save(preferences)
+        save(preferences, false)
     }
 
     private suspend fun saveSettingsFromCache(needsCreate: Boolean) = withContext(Dispatchers.IO) {
@@ -83,12 +83,14 @@ class AppPreferencesDao : PreferencesDao {
             updateOrAppendNode(OPEN_WEATHER_API_KEY, preferences, Setting.openWeatherAPIKey)
             updateOrAppendNode(IMAGE_DIRECTORY, preferences, Setting.imageDirectory)
         }
-        save(preferences)
+        save(preferences, needsCreate)
     }
 
-    private suspend fun save(preferences: Document) {
+    private suspend fun save(preferences: Document, needsIndent: Boolean) {
         TransformerFactory.newInstance()
             .newTransformer().apply {
+                if (needsIndent)
+                    setOutputProperty(OutputKeys.INDENT, "yes")
                 setOutputProperty(OutputKeys.METHOD, "xml")
                 setOutputProperty("{https://xml.apache.org/xalan}indent-amount", "4")
             }
