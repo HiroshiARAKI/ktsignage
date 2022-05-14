@@ -8,7 +8,7 @@ import javafx.scene.control.Label
 import kotlinx.coroutines.launch
 import net.hirlab.ktsignage.MyApp
 import net.hirlab.ktsignage.config.*
-import net.hirlab.ktsignage.model.gateway.WeatherRepository
+import net.hirlab.ktsignage.model.dao.WeatherDao
 import net.hirlab.ktsignage.style.ColorConstants
 import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.util.Logger
@@ -39,8 +39,8 @@ class SettingFragment : Fragment(TITLE) {
         add(settingDetail)
     }
 
-    private val weatherAPIKeyValidation = SimpleBooleanProperty(WeatherRepository.Status.isSuccess)
-    private val weatherAPIKeyValidationText = SimpleStringProperty(WeatherRepository.Status.message)
+    private val weatherAPIKeyValidation = SimpleBooleanProperty(WeatherDao.Status.isSuccess)
+    private val weatherAPIKeyValidationText = SimpleStringProperty(WeatherDao.Status.message)
 
     private val settingPropertyMap = mapOf<KClass<out SettingItem>, MutableMap<SettingItem, SimpleStringProperty>>(
         Language::class to mutableMapOf(),
@@ -63,7 +63,7 @@ class SettingFragment : Fragment(TITLE) {
         }
     }
 
-    private val weatherRepositoryStatusListener = WeatherRepository.Status.Listener { isSuccess, message ->
+    private val weatherRepositoryStatusListener = WeatherDao.Status.Listener { isSuccess, message ->
         MyApp.applicationScope.launch {
             weatherAPIKeyValidation.value = isSuccess
             weatherAPIKeyValidationText.value = message
@@ -73,13 +73,13 @@ class SettingFragment : Fragment(TITLE) {
     init {
         root += container
         Setting.addListener(configListener)
-        WeatherRepository.Status.addListener(weatherRepositoryStatusListener)
+        WeatherDao.Status.addListener(weatherRepositoryStatusListener)
     }
 
     override fun onDelete() {
         super.onDelete()
         Setting.removeListener(configListener)
-        WeatherRepository.Status.removeListener(weatherRepositoryStatusListener)
+        WeatherDao.Status.removeListener(weatherRepositoryStatusListener)
     }
 
     private fun EventTarget.settingItem(setting: Settings) = label(setting.itemName) {

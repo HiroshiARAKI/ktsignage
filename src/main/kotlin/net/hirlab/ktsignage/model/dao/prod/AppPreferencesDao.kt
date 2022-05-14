@@ -1,10 +1,11 @@
-package net.hirlab.ktsignage.model.dao
+package net.hirlab.ktsignage.model.dao.prod
 
 import com.google.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.hirlab.ktsignage.ResourceAccessor
 import net.hirlab.ktsignage.config.*
+import net.hirlab.ktsignage.model.dao.PreferencesDao
 import net.hirlab.ktsignage.util.Logger
 import org.w3c.dom.Document
 import org.w3c.dom.Node

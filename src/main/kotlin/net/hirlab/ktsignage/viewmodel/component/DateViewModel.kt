@@ -8,8 +8,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import net.hirlab.ktsignage.config.*
+import net.hirlab.ktsignage.model.dao.WeatherDao
 import net.hirlab.ktsignage.model.data.Weather
-import net.hirlab.ktsignage.model.gateway.WeatherRepository
+import net.hirlab.ktsignage.model.dao.prod.OpenWeatherAPI
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.util.image
 import net.hirlab.ktsignage.util.runWithDelay
@@ -19,9 +20,9 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
-class DateViewModel(
-    private val weatherRepository: WeatherRepository = WeatherRepository()
-) : ViewModel() {
+class DateViewModel : ViewModel() {
+    private val weatherRepository: WeatherDao by di()
+
     val dateString = SimpleStringProperty("")
     val weatherIcon = SimpleObjectProperty<Image>()
     val tempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)

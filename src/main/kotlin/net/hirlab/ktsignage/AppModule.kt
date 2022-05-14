@@ -2,7 +2,9 @@ package net.hirlab.ktsignage
 
 import com.google.inject.AbstractModule
 import net.hirlab.ktsignage.model.dao.PreferencesDao
-import net.hirlab.ktsignage.model.dao.AppPreferencesDao
+import net.hirlab.ktsignage.model.dao.WeatherDao
+import net.hirlab.ktsignage.model.dao.prod.AppPreferencesDao
+import net.hirlab.ktsignage.model.dao.prod.OpenWeatherAPI
 
 /**
  * Application module for Google Guice, dependency injection framework.
@@ -10,5 +12,6 @@ import net.hirlab.ktsignage.model.dao.AppPreferencesDao
 class AppModule : AbstractModule() {
     override fun configure() {
         bind(PreferencesDao::class.java).to(AppPreferencesDao::class.java)
+        bind(WeatherDao::class.java).to(OpenWeatherAPI::class.java)
     }
 }
