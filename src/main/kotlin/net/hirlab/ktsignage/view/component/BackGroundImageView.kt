@@ -27,7 +27,7 @@ class BackGroundImageView : BaseView() {
     }
 
     init {
-        viewModel.loadImages()
+        viewModel.initializeImages()
         root.center = view
     }
 }

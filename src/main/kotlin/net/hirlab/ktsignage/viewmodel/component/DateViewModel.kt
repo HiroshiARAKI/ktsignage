@@ -11,7 +11,7 @@ import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.model.gateway.WeatherRepository
 import net.hirlab.ktsignage.util.Logger
-import net.hirlab.ktsignage.util.loadImage
+import net.hirlab.ktsignage.util.image
 import net.hirlab.ktsignage.util.runWithDelay
 import net.hirlab.ktsignage.viewmodel.ViewModel
 import java.time.ZoneId
@@ -90,7 +90,7 @@ class DateViewModel(
         val weather = weatherRepository.getCurrentWeather()
         Logger.d("Current weather is $weather")
         if (weather != null) {
-            weatherIcon.value = loadImage("https://openweathermap.org/img/wn/${weather.icon}@2x.png")
+            weatherIcon.value = image("https://openweathermap.org/img/wn/${weather.icon}@2x.png")
             tempFloat.value = weather.temp.toCelsius()
             maxTempFloat.value = weather.maxTemp.toCelsius()
             minTempFloat.value = weather.minTemp.toCelsius()
