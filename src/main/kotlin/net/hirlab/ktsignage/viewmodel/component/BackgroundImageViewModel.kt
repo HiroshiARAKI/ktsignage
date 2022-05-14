@@ -1,11 +1,12 @@
 package net.hirlab.ktsignage.viewmodel.component
 
 import com.google.common.annotations.VisibleForTesting
-import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.image.Image
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.hirlab.ktsignage.config.ImageDirectory
 import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.data.RingBuffer
@@ -26,6 +27,7 @@ class BackgroundImageViewModel : ViewModel() {
 
     private var imageSwitchingJob: Job? = null
 
+    private val mutex = Mutex()
 
     private val settingListener = object : Setting.Listener {
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
@@ -47,15 +49,17 @@ class BackgroundImageViewModel : ViewModel() {
      */
     fun initializeImages() {
         viewModelScope.launch(Dispatchers.IO) {
-            val imagePaths = getImageFilePaths()
-            if (imagePaths.isEmpty()) {
-                Logger.w("initializeImages(): ${Setting.imageDirectory} has no images.")
-                return@launch
+            mutex.withLock {
+                val imagePaths = getImageFilePaths()
+                if (imagePaths.isEmpty()) {
+                    Logger.w("initializeImages(): ${Setting.imageDirectory} has no images.")
+                    return@launch
+                }
+                imageBuffer = RingBuffer(imagePaths)
+                Logger.d("loadImages(): load paths ... $imageBuffer")
+                loadImage()
+                startImageSwitching()
             }
-            imageBuffer = RingBuffer(imagePaths)
-            Logger.d("loadImages(): load paths ... $imageBuffer")
-            loadImage()
-            startImageSwitching()
         }
     }
 
@@ -65,10 +69,12 @@ class BackgroundImageViewModel : ViewModel() {
     fun nextImage() {
         if (!::nextImageCache.isInitialized) return
         viewModelScope.launch {
-            currentImage.value = nextImageCache
-            imageBuffer.moveNext()
-            loadImage(needsCurrentImageUpdate = false)
-            startImageSwitching()
+            mutex.withLock {
+                currentImage.value = nextImageCache
+                imageBuffer.moveNext()
+                loadImage(needsCurrentImageUpdate = false)
+                startImageSwitching()
+            }
         }
     }
 
@@ -78,10 +84,12 @@ class BackgroundImageViewModel : ViewModel() {
     fun prevImage() {
         if (!::prevImageCache.isInitialized) return
         viewModelScope.launch {
-            currentImage.value = prevImageCache
-            imageBuffer.movePrevious()
-            loadImage(needsCurrentImageUpdate = false)
-            startImageSwitching()
+            mutex.withLock {
+                currentImage.value = prevImageCache
+                imageBuffer.movePrevious()
+                loadImage(needsCurrentImageUpdate = false)
+                startImageSwitching()
+            }
         }
     }
 
