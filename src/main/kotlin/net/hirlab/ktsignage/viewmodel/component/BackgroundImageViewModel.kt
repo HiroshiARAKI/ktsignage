@@ -25,7 +25,7 @@ class BackgroundImageViewModel : ViewModel() {
     private lateinit var nextImageCache: Image
 
     private var imageSwitchingJob: Job? = null
-    private var currentPointer = 0
+
 
     private val settingListener = object : Setting.Listener {
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
@@ -54,7 +54,6 @@ class BackgroundImageViewModel : ViewModel() {
             }
             imageBuffer = RingBuffer(imagePaths)
             Logger.d("loadImages(): load paths ... $imageBuffer")
-            currentPointer = 0
             loadImage()
             startImageSwitching()
         }
