@@ -2,7 +2,6 @@ package net.hirlab.ktsignage.view.fragment
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.event.EventTarget
 import javafx.scene.Group
 import javafx.scene.control.Label
@@ -124,6 +123,7 @@ class SettingFragment : Fragment(TITLE) {
     private fun openWithOpenWeatherAPISetting() {
         settingDetail.replaceChildren(
             vbox {
+                addClass(Theme.settingWeatherStatus)
                 label("Your OpenWeather API Key:")
                 textfield {
                     text = Setting.openWeatherAPIKey
@@ -132,19 +132,19 @@ class SettingFragment : Fragment(TITLE) {
                             viewModel.setOpenWeatherAPIKeyAfterDelay(it)
                     }
                 }
-                textflow {
-                    text("See ")
-                    hyperlink("this link") {
-                        action { hostServices.showDocument("https://openweathermap.org/") }
-                    }
-                    text("a bout OpenWeather API.")
-                }
                 label(weatherAPIKeyValidationText) {
-                    addClass(Theme.settingWeatherStatus)
                     switchTextColorOfValidation(weatherAPIKeyValidation.value)
                     weatherAPIKeyValidation.onChange { isSuccess ->
                         switchTextColorOfValidation(isSuccess)
                     }
+                }
+                textflow {
+                    addClass(Theme.marginTopBottom)
+                    text("See")
+                    hyperlink("this link") {
+                        action { hostServices.showDocument("https://openweathermap.org/") }
+                    }
+                    text("about OpenWeather API.")
                 }
             }
         )
@@ -152,9 +152,9 @@ class SettingFragment : Fragment(TITLE) {
 
     private fun Label.switchTextColorOfValidation(isSuccess: Boolean) {
         textFill = if (isSuccess) {
-            ColorConstants.GREEN
+            ColorConstants.SUCCESS
         } else {
-            ColorConstants.RED
+            ColorConstants.ERROR
         }
     }
 

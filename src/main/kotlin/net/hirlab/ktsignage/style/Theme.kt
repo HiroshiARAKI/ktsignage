@@ -50,7 +50,7 @@ class Theme : Stylesheet() {
             padding = box(5.px)
             prefWidth = SETTING_FRAGMENT_WIDTH / 2
             font = ResourceAccessor.openSansFont
-            fontSize = 1.5.rem
+            fontSize = 1.3.rem
             backgroundColor += ColorConstants.PALE_WHITE
         }
 
@@ -70,7 +70,7 @@ class Theme : Stylesheet() {
 
         settingDetailContainer {
             padding = box(5.px)
-            fontSize = 1.2.rem
+            fontSize = 1.1.rem
             backgroundColor += ColorConstants.LIGHT_GRAY
             prefWidth = SETTING_FRAGMENT_WIDTH / 2
         }
@@ -90,12 +90,16 @@ class Theme : Stylesheet() {
 
         settingWeatherStatus {
             padding = box(5.px, 0.px)
+            fontSize = 1.0.rem
         }
 
         marginLeftRight {
             padding = box(0.px, 10.px)
         }
 
+        marginTopBottom {
+            padding = box(10.px, 0.px)
+        }
     }
 
     companion object {
@@ -119,5 +123,6 @@ class Theme : Stylesheet() {
         val settingWeatherStatus by cssclass()
 
         val marginLeftRight by cssclass()
+        val marginTopBottom by cssclass()
     }
 }
