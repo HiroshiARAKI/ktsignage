@@ -28,31 +28,6 @@ class WeatherRepository {
         JSONObject(response.body!!.string()).toWeather()
     }
 
-    /**
-     * OpenWeather API access status.
-     */
-    object Status {
-        var isSuccess = true
-            private set
-        var message = ""
-            private set
-
-        private val listeners = mutableSetOf<Listener>()
-
-        fun setStatus(isSuccess: Boolean, message: String) {
-            this.isSuccess = isSuccess
-            this.message = message
-            listeners.forEach { it.onStatusChanged(isSuccess, message) }
-        }
-
-        fun addListener(listener: Listener) { listeners.add(listener) }
-        fun removeListener(listener: Listener) { listeners.remove(listener) }
-
-        fun interface Listener {
-            fun onStatusChanged(isSuccess: Boolean, message: String)
-        }
-    }
-
     companion object {
         private const val URL = "https://api.openweathermap.org/data/2.5/weather"
 
@@ -75,6 +50,44 @@ class WeatherRepository {
                 humidity = temp.getInt("humidity"),
                 time = time,
             )
+        }
+    }
+
+    /**
+     * OpenWeather API access status.
+     */
+    object Status {
+        /** OpenWeather API access is success. */
+        var isSuccess = true
+            private set
+        /** Message gotten when accesses OpenWeather API. */
+        var message = ""
+            private set
+
+        private val listeners = mutableSetOf<Listener>()
+
+        /** Sets a result status of OpenWeather API access. */
+        @Synchronized
+        internal fun setStatus(isSuccess: Boolean, message: String) {
+            this.isSuccess = isSuccess
+            this.message = message
+            listeners.forEach { it.onStatusChanged(isSuccess, message) }
+        }
+
+        /** Adds [Listener]. */
+        @Synchronized
+        fun addListener(listener: Listener) { listeners.add(listener) }
+
+        /** Removes [Listener]. */
+        @Synchronized
+        fun removeListener(listener: Listener) { listeners.remove(listener) }
+
+        /**
+         * Listener of this [Status] changes.
+         */
+        fun interface Listener {
+            /** Called when this [Status] is changed. */
+            fun onStatusChanged(isSuccess: Boolean, message: String)
         }
     }
 }
