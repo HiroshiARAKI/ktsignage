@@ -29,10 +29,10 @@ KtSignage is designed based on MVVM (Model-View-ViewModel).
   * DAOs must have the own interfaces to debug easily
 
 ## LICENSE
+Write here Later
 
-
-### Troubleshooting
-#### OpenJFX setting
+## Troubleshooting
+### OpenJFX setting
 If you use OpenJFX, add the following `implementation` into `build.gradle.kts`.
 ```kotlin
 dependencies {
@@ -43,6 +43,6 @@ dependencies {
 }
 ```
 
-#### prism_es2 is not found
+### prism_es2 is not found
 1. Download OpenJFX directly from [https://openjfx.io/](https://openjfx.io/).
 2. Copy `*.so` files into `/usr/share/openjfx/lib`.
