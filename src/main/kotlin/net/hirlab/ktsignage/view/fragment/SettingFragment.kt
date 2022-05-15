@@ -167,7 +167,6 @@ class SettingFragment : Fragment(TITLE) {
                     text = Setting.imageDirectory
                     action {
                         chooseDirectory(
-                            initialDirectory = File(Setting.imageDirectory),
                             owner = primaryStage.owner
                         )?.let {
                             text = it.path
