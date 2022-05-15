@@ -1,6 +1,8 @@
-package net.hirlab.ktsignage.config
+/*
+ * Copyright (c) 2022 Hiroshi ARAKI. All Rights Reserved.
+ */
 
-import java.lang.IllegalArgumentException
+package net.hirlab.ktsignage.config
 
 /**
  * Available locations.

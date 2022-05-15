@@ -1,12 +1,21 @@
+/*
+ * Copyright (c) 2022 Hiroshi ARAKI. All Rights Reserved.
+ */
+
 package net.hirlab.ktsignage
 
 import com.google.inject.Guice
-import kotlin.reflect.KClass
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.javafx.JavaFx
 import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.view.MainView
-import tornadofx.*
+import tornadofx.App
+import tornadofx.DIContainer
+import tornadofx.FX
+import kotlin.reflect.KClass
 
 class MyApp: App(MainView::class, Theme::class) {
     private val guice = Guice.createInjector(AppModule())

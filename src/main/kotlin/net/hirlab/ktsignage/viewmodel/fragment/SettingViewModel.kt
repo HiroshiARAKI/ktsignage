@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2022 Hiroshi ARAKI. All Rights Reserved.
+ */
+
 package net.hirlab.ktsignage.viewmodel.fragment
 
 import kotlinx.coroutines.channels.Channel

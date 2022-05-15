@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) 2022 Hiroshi ARAKI. All Rights Reserved.
+ */
+
 package net.hirlab.ktsignage.viewmodel
 
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.Controller
 import java.io.Closeable
+import kotlin.coroutines.CoroutineContext
 
 /**
  * ViewModel class for TornadoFX.

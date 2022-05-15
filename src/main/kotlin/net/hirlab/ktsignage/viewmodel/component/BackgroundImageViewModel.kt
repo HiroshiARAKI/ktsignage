@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2022 Hiroshi ARAKI. All Rights Reserved.
+ */
+
 package net.hirlab.ktsignage.viewmodel.component
 
 import com.google.common.annotations.VisibleForTesting
