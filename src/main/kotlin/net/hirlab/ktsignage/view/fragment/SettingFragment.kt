@@ -14,7 +14,6 @@ import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.viewmodel.fragment.SettingViewModel
 import tornadofx.*
-import java.io.File
 import kotlin.reflect.KClass
 
 /**
