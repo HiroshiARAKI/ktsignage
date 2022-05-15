@@ -1,2 +1,2 @@
-rootProject.name = "tornadofx-gradle-project-kts"
+rootProject.name = "kt-signage"
 
