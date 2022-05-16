@@ -6,6 +6,7 @@ package net.hirlab.ktsignage.view.component
 
 import javafx.scene.Group
 import net.hirlab.ktsignage.model.data.Weather
+import net.hirlab.ktsignage.style.ColorConstants
 import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.view.BaseView
 import net.hirlab.ktsignage.viewmodel.component.DateViewModel
@@ -30,11 +31,14 @@ class DateView : BaseView() {
     init {
         root += vbox {
             addClass(Theme.date)
-            label(viewModel.dateString)
+            label(viewModel.dateString) {
+                textFill = ColorConstants.WHITE
+            }
             hbox {
                 addClass(Theme.weather)
                 label(city) {
                     addClass(Theme.city)
+                    textFill = ColorConstants.WHITE
                 }
                 imageview(viewModel.weatherIcon) {
                     fitWidth = 90.0
@@ -42,12 +46,13 @@ class DateView : BaseView() {
                 }
                 label(temp) {
                     addClass(Theme.marginLeftRight)
+                    textFill = ColorConstants.WHITE
                 }
                 vbox {
                     addClass(Theme.minMaxTemp)
                     addClass(Theme.marginLeftRight)
-                    label(maxTemp)
-                    label(minTemp)
+                    label(maxTemp) { textFill = ColorConstants.WHITE }
+                    label(minTemp) { textFill = ColorConstants.WHITE }
                 }
             }
         }
