@@ -85,6 +85,7 @@ class AppPreferencesDao : PreferencesDao {
             updateOrAppendNode(target, preferences, settingItem)
         }
         save(preferences, false)
+        Logger.d("$TAG.saveSettings(target=$target, settingItem=$settingItem)")
     }
 
     private suspend fun saveSettingsFromCache(needsCreate: Boolean) = withContext(Dispatchers.IO) {

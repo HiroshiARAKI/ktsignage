@@ -85,11 +85,11 @@ object Setting {
      * Listener for setting changes.
      */
     interface Listener {
-        fun onLanguageChanged(language: Language) { }
-        fun onLocationChanged(location: Location) { }
-        fun onDateFormatChanged(dateFormat: DateFormat) { }
-        fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { }
-        fun onImageDirectoryChanged(directory: ImageDirectory) { }
-        fun onImageTransitionChanged(transition: ImageTransition) { }
+        fun onLanguageChanged(language: Language)
+        fun onLocationChanged(location: Location)
+        fun onDateFormatChanged(dateFormat: DateFormat)
+        fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey)
+        fun onImageDirectoryChanged(directory: ImageDirectory)
+        fun onImageTransitionChanged(transition: ImageTransition)
     }
 }

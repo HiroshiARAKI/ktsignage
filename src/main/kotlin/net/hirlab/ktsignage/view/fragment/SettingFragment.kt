@@ -47,25 +47,6 @@ class SettingFragment : Fragment(TITLE) {
     private val weatherAPIKeyValidation = SimpleBooleanProperty(WeatherDao.Status.isSuccess)
     private val weatherAPIKeyValidationText = SimpleStringProperty(WeatherDao.Status.message)
 
-    private val settingPropertyMap: Map<KClass<out SettingItem>, MutableMap<SettingItem, SimpleStringProperty>>
-        = Setting.settingMap.mapValues { mutableMapOf() }
-
-    private val configListener = object : Setting.Listener {
-        override fun onLanguageChanged(language: Language) { updateLabelOf(language) }
-        override fun onLocationChanged(location: Location) { updateLabelOf(location)}
-        override fun onDateFormatChanged(dateFormat: DateFormat) { updateLabelOf(dateFormat) }
-        override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { viewModel.saveSetting(apiKey) }
-        override fun onImageDirectoryChanged(directory: ImageDirectory) { viewModel.saveSetting(directory) }
-        override fun onImageTransitionChanged(transition: ImageTransition) { updateLabelOf(transition) }
-
-        private fun updateLabelOf(setting: SettingItem) {
-            settingPropertyMap[setting::class]!!.entries.forEach { (item, property) ->
-                property.value = item.getLabel(property.name == setting.itemName)
-            }
-            viewModel.saveSetting(setting)
-        }
-    }
-
     private val weatherRepositoryStatusListener = WeatherDao.Status.Listener { isSuccess, message ->
         MyApp.applicationScope.launch {
             weatherAPIKeyValidation.value = isSuccess
@@ -75,13 +56,12 @@ class SettingFragment : Fragment(TITLE) {
 
     init {
         root += container
-        Setting.addListener(configListener)
         WeatherDao.Status.addListener(weatherRepositoryStatusListener)
+        viewModel.initialize()
     }
 
     override fun onDelete() {
         super.onDelete()
-        Setting.removeListener(configListener)
         WeatherDao.Status.removeListener(weatherRepositoryStatusListener)
     }
 
@@ -187,8 +167,6 @@ class SettingFragment : Fragment(TITLE) {
             ColorConstants.ERROR
         }
     }
-
-    private fun SettingItem.getLabel(isSelected: Boolean) = (if (isSelected) "☑︎ " else "□ ") + itemName
 
     companion object {
         private const val TITLE = "Application Settings"

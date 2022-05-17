@@ -63,6 +63,10 @@ class DateViewModel : ViewModel() {
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
             // do nothing
         }
+
+        override fun onImageTransitionChanged(transition: ImageTransition) {
+            // do nothing
+        }
     }
 
     /**

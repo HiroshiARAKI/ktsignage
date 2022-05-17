@@ -11,9 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.hirlab.ktsignage.config.ImageDirectory
-import net.hirlab.ktsignage.config.ImageTransition
-import net.hirlab.ktsignage.config.Setting
+import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.data.RingBuffer
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.util.image
@@ -34,10 +32,21 @@ class BackgroundImageViewModel : ViewModel() {
     private val mutex = Mutex()
 
     private val settingListener = object : Setting.Listener {
+        override fun onLanguageChanged(language: Language) {
+            // do nothing
+        }
+        override fun onLocationChanged(location: Location) {
+            // do nothing
+        }
+        override fun onDateFormatChanged(dateFormat: DateFormat) {
+            // do nothing
+        }
+        override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) {
+            // do nothing
+        }
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
             initializeImages()
         }
-
         override fun onImageTransitionChanged(transition: ImageTransition) {
             Logger.d("$TAG#onImageTransitionChanged(): startImageSwitching with $transition")
             startImageSwitching()

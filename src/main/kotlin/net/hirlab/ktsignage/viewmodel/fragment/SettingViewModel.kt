@@ -27,10 +27,32 @@ class SettingViewModel : ViewModel() {
         }
     }
 
+    private val configListener = object : Setting.Listener {
+        override fun onLanguageChanged(language: Language) { saveSetting(language) }
+        override fun onLocationChanged(location: Location) { saveSetting(location) }
+        override fun onDateFormatChanged(dateFormat: DateFormat) { saveSetting(dateFormat) }
+        override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { saveSetting(apiKey) }
+        override fun onImageDirectoryChanged(directory: ImageDirectory) { saveSetting(directory) }
+        override fun onImageTransitionChanged(transition: ImageTransition) { saveSetting(transition) }
+    }
+
+    /**
+     * Initializes this ViewModel.
+     */
+    fun initialize() {
+        Setting.addListener(configListener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Setting.removeListener(configListener)
+    }
+
     /**
      * Saves [settingItem] to preferences file.
      */
-    fun saveSetting(settingItem: SettingItem) {
+    private fun saveSetting(settingItem: SettingItem) {
+        Logger.d("$TAG.saveSetting(settingItem=$settingItem)")
         MyApp.applicationScope.launch {
             when (settingItem) {
                 is DateFormat -> preferencesDao.saveDateFormat(settingItem)
@@ -72,5 +94,9 @@ class SettingViewModel : ViewModel() {
                 func()
             }
         }
+    }
+
+    companion object {
+        private val TAG = SettingViewModel::class.java.simpleName
     }
 }
