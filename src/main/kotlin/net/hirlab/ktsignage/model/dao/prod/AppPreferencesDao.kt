@@ -51,6 +51,9 @@ class AppPreferencesDao : PreferencesDao {
                 Setting.openWeatherAPIKey = getNode(OPEN_WEATHER_API_KEY, preferences)?.textContent ?: ""
                 Setting.imageDirectory = getNode(IMAGE_DIRECTORY, preferences)?.textContent
                     ?: ResourceAccessor.imagePath
+                Setting.imageTransition = getNode(IMAGE_TRANSITION, preferences)?.let {
+                    ImageTransition.valueOfOrDefault(it.textContent)
+                } ?: ImageTransition.DEFAULT
             }
             Logger.d("$TAG.initialize: loaded preferences (${Setting.getLog()})")
         } else {
@@ -67,8 +70,13 @@ class AppPreferencesDao : PreferencesDao {
     override suspend fun saveOpenWeatherAPIKey(apiKey: OpenWeatherApiKey) {
         saveSettings(OPEN_WEATHER_API_KEY, apiKey.value)
     }
+
     override suspend fun saveImageDirectory(directory: ImageDirectory) {
         saveSettings(IMAGE_DIRECTORY, directory.value)
+    }
+
+    override suspend fun saveImageTransition(transition: ImageTransition) {
+        saveSettings(IMAGE_TRANSITION, transition.name)
     }
 
     private suspend fun saveSettings(target: String, settingItem: String) = withContext(Dispatchers.IO) {
@@ -87,6 +95,7 @@ class AppPreferencesDao : PreferencesDao {
             updateOrAppendNode(LOCATION, preferences, Setting.location.name)
             updateOrAppendNode(OPEN_WEATHER_API_KEY, preferences, Setting.openWeatherAPIKey)
             updateOrAppendNode(IMAGE_DIRECTORY, preferences, Setting.imageDirectory)
+            updateOrAppendNode(IMAGE_TRANSITION, preferences, Setting.imageTransition.name)
         }
         save(preferences, needsCreate)
     }
@@ -141,5 +150,6 @@ class AppPreferencesDao : PreferencesDao {
         private const val LOCATION = "location"
         private const val OPEN_WEATHER_API_KEY = "open_weather_api_key"
         private const val IMAGE_DIRECTORY = "image_directory"
+        private const val IMAGE_TRANSITION = "image_transition"
     }
 }

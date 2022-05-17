@@ -42,10 +42,19 @@ object Setting {
             Logger.d("$TAG.location is changed to $value")
         }
 
+    var imageTransition = ImageTransition.DEFAULT
+        set(value) {
+            field = value
+            settingMap[ImageTransition::class] = value
+            synchronized(lock) { listeners.forEach { it.onImageTransitionChanged(value) } }
+            Logger.d("$TAG.imageTransition is changed to $value")
+        }
+
     val settingMap = mutableMapOf<KClass<out SettingItem>, SettingItem>(
         Language::class to lang,
         Location::class to location,
-        DateFormat::class to dateFormat
+        DateFormat::class to dateFormat,
+        ImageTransition::class to imageTransition,
     )
 
     var openWeatherAPIKey = ""
@@ -81,5 +90,6 @@ object Setting {
         fun onDateFormatChanged(dateFormat: DateFormat) { }
         fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { }
         fun onImageDirectoryChanged(directory: ImageDirectory) { }
+        fun onImageTransitionChanged(transition: ImageTransition) { }
     }
 }

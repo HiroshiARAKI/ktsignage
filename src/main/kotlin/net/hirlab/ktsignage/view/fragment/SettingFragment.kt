@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
 import javafx.scene.Group
 import javafx.scene.control.Label
+import javafx.util.StringConverter
 import kotlinx.coroutines.launch
 import net.hirlab.ktsignage.MyApp
 import net.hirlab.ktsignage.config.*
@@ -46,11 +47,8 @@ class SettingFragment : Fragment(TITLE) {
     private val weatherAPIKeyValidation = SimpleBooleanProperty(WeatherDao.Status.isSuccess)
     private val weatherAPIKeyValidationText = SimpleStringProperty(WeatherDao.Status.message)
 
-    private val settingPropertyMap = mapOf<KClass<out SettingItem>, MutableMap<SettingItem, SimpleStringProperty>>(
-        Language::class to mutableMapOf(),
-        Location::class to mutableMapOf(),
-        DateFormat::class to mutableMapOf(),
-    )
+    private val settingPropertyMap: Map<KClass<out SettingItem>, MutableMap<SettingItem, SimpleStringProperty>>
+        = Setting.settingMap.mapValues { mutableMapOf() }
 
     private val configListener = object : Setting.Listener {
         override fun onLanguageChanged(language: Language) { updateLabelOf(language) }
@@ -58,6 +56,7 @@ class SettingFragment : Fragment(TITLE) {
         override fun onDateFormatChanged(dateFormat: DateFormat) { updateLabelOf(dateFormat) }
         override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { viewModel.saveSetting(apiKey) }
         override fun onImageDirectoryChanged(directory: ImageDirectory) { viewModel.saveSetting(directory) }
+        override fun onImageTransitionChanged(transition: ImageTransition) { updateLabelOf(transition) }
 
         private fun updateLabelOf(setting: SettingItem) {
             settingPropertyMap[setting::class]!!.entries.forEach { (item, property) ->
@@ -94,6 +93,7 @@ class SettingFragment : Fragment(TITLE) {
                 Language::class -> Language.values()
                 Location::class -> Location.values()
                 DateFormat::class -> DateFormat.values()
+                ImageTransition::class -> ImageTransition.values()
                 OpenWeatherApiKey::class -> {
                     openWithOpenWeatherAPISetting()
                     null
@@ -108,22 +108,18 @@ class SettingFragment : Fragment(TITLE) {
         }
     }
 
-    private fun updateSettingDetail(settingValues: List<SettingItem>) {
+    private inline fun <reified T : SettingItem> updateSettingDetail(settingValues: List<T>) {
+        val type = settingValues[0]::class
         settingDetail.replaceChildren(
             flowpane {
                 hgap = 10.0
                 vgap = 10.0
                 addClass(Theme.settingDetailContainer)
-                settingValues.forEach {
-                    val isSelected = it == Setting.settingMap[it::class]
-                    val name = SimpleStringProperty(null, it.itemName, it.getLabel(isSelected))
-                    settingPropertyMap[it::class]!![it] = name
-                    label(name) {
-                        addClass(Theme.settingDetail)
-                        onLeftClick(1) {
-                            if (it != Setting.settingMap[it::class]) it.select()
-                        }
-                    }
+                combobox (values = settingValues) {
+                    converter = getConvertor<T>(type)
+                    Logger.d("type= $type")
+                    value = Setting.settingMap[type] as T?
+                    valueProperty().onChange { it?.select() }
                 }
             }
         )
@@ -196,5 +192,24 @@ class SettingFragment : Fragment(TITLE) {
 
     companion object {
         private const val TITLE = "Application Settings"
+
+        /**
+         * Gets original [StringConverter].
+         */
+        private fun <T : SettingItem> getConvertor(type: KClass<*>) = object : StringConverter<T>() {
+            override fun toString(item: T?) = item?.itemName ?: ""
+
+            @Suppress("unchecked_cast")
+            override fun fromString(string: String?): T? {
+                if (string == null) return null
+                return when (type) {
+                    Language::class -> Language.valueOfOrDefault(string)
+                    Location::class -> Location.valueOfOrDefault(string)
+                    DateFormat::class -> DateFormat.valueOfOrDefault(string)
+                    ImageTransition::class -> ImageTransition.valueOfOrDefault(string)
+                    else -> null
+                } as T?
+            }
+        }
     }
 }

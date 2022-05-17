@@ -38,6 +38,7 @@ class SettingViewModel : ViewModel() {
                 is Location -> preferencesDao.saveLocation(settingItem)
                 is OpenWeatherApiKey -> preferencesDao.saveOpenWeatherAPIKey(settingItem)
                 is ImageDirectory -> preferencesDao.saveImageDirectory(settingItem)
+                is ImageTransition -> preferencesDao.saveImageTransition(settingItem)
             }
         }
     }

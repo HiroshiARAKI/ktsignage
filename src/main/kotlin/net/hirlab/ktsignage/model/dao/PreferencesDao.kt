@@ -39,4 +39,9 @@ interface PreferencesDao {
      * Saves image [directory] to preferences data file.
      */
     suspend fun saveImageDirectory(directory: ImageDirectory)
+
+    /**
+     * Saves image [transition] to preferences data file.
+     */
+    suspend fun saveImageTransition(transition: ImageTransition)
 }

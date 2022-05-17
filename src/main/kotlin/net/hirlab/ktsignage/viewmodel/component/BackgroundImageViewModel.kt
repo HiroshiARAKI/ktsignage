@@ -12,6 +12,7 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.hirlab.ktsignage.config.ImageDirectory
+import net.hirlab.ktsignage.config.ImageTransition
 import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.data.RingBuffer
 import net.hirlab.ktsignage.util.Logger
@@ -19,7 +20,6 @@ import net.hirlab.ktsignage.util.image
 import net.hirlab.ktsignage.util.runWithDelay
 import net.hirlab.ktsignage.viewmodel.ViewModel
 import java.io.File
-import java.util.concurrent.TimeUnit
 import javax.activation.MimetypesFileTypeMap
 
 class BackgroundImageViewModel : ViewModel() {
@@ -36,6 +36,11 @@ class BackgroundImageViewModel : ViewModel() {
     private val settingListener = object : Setting.Listener {
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
             initializeImages()
+        }
+
+        override fun onImageTransitionChanged(transition: ImageTransition) {
+            Logger.d("$TAG#onImageTransitionChanged(): startImageSwitching with $transition")
+            startImageSwitching()
         }
     }
 
@@ -100,8 +105,8 @@ class BackgroundImageViewModel : ViewModel() {
     private fun startImageSwitching() {
         if (imageSwitchingJob?.isActive == true) imageSwitchingJob?.cancel()
         imageSwitchingJob = viewModelScope.launch(Dispatchers.Default) {
-            delay(SLIDESHOW_DELAY_TIME_MILLIS)
-            runWithDelay(SLIDESHOW_DELAY_TIME_MILLIS) {
+            delay(Setting.imageTransition.value)
+            runWithDelay(Setting.imageTransition.value) {
                 imageBuffer.moveNext()
                 loadImage()
             }
@@ -121,8 +126,7 @@ class BackgroundImageViewModel : ViewModel() {
     }
 
     companion object {
-        // TODO: Duration of image transition should be settable by users (#3)
-        private val SLIDESHOW_DELAY_TIME_MILLIS = TimeUnit.MINUTES.toMillis(1)
+        private val TAG = BackgroundImageViewModel::class.java.simpleName
 
         @VisibleForTesting
         fun getImageFilePaths(): List<String> {
