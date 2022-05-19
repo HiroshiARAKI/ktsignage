@@ -20,7 +20,6 @@ import net.hirlab.ktsignage.util.runWithDelay
 import net.hirlab.ktsignage.viewmodel.ViewModel
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 class DateViewModel : ViewModel() {
@@ -36,25 +35,25 @@ class DateViewModel : ViewModel() {
     lateinit var backgroundColorStyleProperty: StringProperty
     val textColorStyleProperties = mutableListOf<ObjectProperty<Paint>>()
 
-    private var formatter = getDateTimeFormatter()
+    private var formatter = Setting.getDateTimeFormatter()
 
     private val configListener = object : Setting.Listener {
         override fun onLanguageChanged(language: Language) {
             viewModelScope.launch {
                 dbAccessQueue.send { loadCurrentWeather() }
             }
-            formatter = getDateTimeFormatter()
+            formatter = Setting.getDateTimeFormatter()
         }
 
         override fun onLocationChanged(location: Location) {
             viewModelScope.launch {
                 dbAccessQueue.send { loadCurrentWeather() }
             }
-            formatter = getDateTimeFormatter()
+            formatter = Setting.getDateTimeFormatter()
         }
 
         override fun onDateFormatChanged(dateFormat: DateFormat) {
-            formatter = getDateTimeFormatter()
+            formatter = Setting.getDateTimeFormatter()
         }
 
         override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) {
@@ -127,6 +126,5 @@ class DateViewModel : ViewModel() {
         private val WEATHER_UPDATE_DELAY_MILLIS = TimeUnit.MINUTES.toMillis(5)
 
         private fun Float.toCelsius() = this - 273.15F
-        private fun getDateTimeFormatter() = DateTimeFormatter.ofPattern(Setting.dateFormat.value, Setting.locale)
     }
 }

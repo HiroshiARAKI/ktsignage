@@ -5,6 +5,7 @@
 package net.hirlab.ktsignage.config
 
 import net.hirlab.ktsignage.util.Logger
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -87,6 +88,8 @@ object Setting {
     fun addListener(listener: Listener) = synchronized(lock) { listeners.add(listener) }
 
     fun removeListener(listener: Listener) = synchronized(lock) { listeners.remove(listener) }
+
+    fun getDateTimeFormatter() = DateTimeFormatter.ofPattern(dateFormat.value, locale)
 
     fun getLog() = "Config: DateFormat=$dateFormat, Lang=$lang, Location=$location"
 
