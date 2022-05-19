@@ -72,6 +72,9 @@ class MainView : BaseView(TITLE) {
             backGroundImageView.swipe(delta < 0)
             mousePointMemory = null
         }
+        root.setOnSwipeLeft { backGroundImageView.swipe(isNext = true) }
+        root.setOnSwipeRight { backGroundImageView.swipe(isNext = false) }
+
         primaryStage.widthProperty().addListener(windowWidthChangeListener)
         primaryStage.heightProperty().addListener(windowHeightChangeListener)
         container.toFront()
