@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import net.hirlab.ktsignage.MyApp
 import net.hirlab.ktsignage.ResourceAccessor
 import net.hirlab.ktsignage.util.Logger
@@ -97,6 +98,7 @@ class DataStore(private val name: String) {
         countDownLatch.await()
         cache[key] = value
         saveValueAsync(key, value)
+        Logger.d("$tag.set($key, $value)")
     }
 
     private suspend fun initializeCache() {
@@ -122,7 +124,7 @@ class DataStore(private val name: String) {
         transformer.saveToXml(newDataStore, needsLineBrake = true)
     }
 
-    private suspend fun getDataStore() = mutex.withLock {
+    private suspend fun getDataStore() = withContext(Dispatchers.IO) {
         DocumentBuilderFactory.newInstance()
             .newDocumentBuilder()
             .parse(preferencesFile)
@@ -136,8 +138,9 @@ class DataStore(private val name: String) {
                 val exists: Boolean
                 xPath.apply {
                     exists = updateNodeOrAppend(key, value, preferences)
+                    Logger.d("$tag.saveValueAsync($key, $value): The node exist? => $exists")
                 }
-                transformer.saveToXml(preferences, needsLineBrake = exists)
+                transformer.saveToXml(preferences)
             }
         }
     }
@@ -157,10 +160,10 @@ class DataStore(private val name: String) {
         }
 
     private fun XPath.getNode(key: String, preferences: Document) =
-        evaluate("$TOP_TAG/$CHILD_TAG/@$ATTRIBUTE_KEY[.=$key]", preferences, XPathConstants.NODE) as Node?
+        evaluate("/$TOP_TAG/$CHILD_TAG[@$ATTRIBUTE_KEY='$key']", preferences, XPathConstants.NODE) as Node?
 
     private fun Document.getDataNodeList() =
-        xPath.evaluate("$TOP_TAG/$CHILD_TAG", this, XPathConstants.NODESET) as NodeList?
+        xPath.evaluate("/$TOP_TAG/$CHILD_TAG", this, XPathConstants.NODESET) as NodeList?
 
     private fun Transformer.saveToXml(preferences: Document, needsLineBrake: Boolean = false) {
         if (needsLineBrake) setOutputProperty(OutputKeys.INDENT, "yes")
