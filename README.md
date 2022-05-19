@@ -29,7 +29,7 @@ KtSignage is designed based on MVVM (Model-View-ViewModel).
   * DAOs must have the own interfaces to debug easily
 
 ## LICENSE
-Write here Later
+MIT License.
 
 ## Troubleshooting
 ### OpenJFX setting
@@ -45,4 +45,5 @@ dependencies {
 
 ### prism_es2 is not found
 1. Download OpenJFX directly from [https://openjfx.io/](https://openjfx.io/).
-2. Copy `*.so` files into `/usr/share/openjfx/lib`.
+2. Copy `*.so` files into `/usr/share/openjfx/lib`. 
+   (If `imageView` is not displayed, replace all files (including `*.jar`) in OpenJFX downloaded from official web.)
