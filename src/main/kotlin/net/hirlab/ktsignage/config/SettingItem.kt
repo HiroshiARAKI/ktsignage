@@ -17,6 +17,7 @@ enum class Settings(val itemName: String, val item: KClass<out SettingItem>) {
     OPEN_WEATHER_API_KEY("OpenWeather API Key", OpenWeatherApiKey::class),
     IMAGE_DIRECTORY("Image directory", ImageDirectory::class),
     IMAGE_TRANSITION("Background transition time", ImageTransition::class),
+    DATE_BACKGROUND("Date background setting", DateBackGround::class),
 }
 
 /**

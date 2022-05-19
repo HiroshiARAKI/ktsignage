@@ -26,7 +26,6 @@ class Theme : Stylesheet() {
             font = ResourceAccessor.openSansFont
             fontSize = 3.8.rem
             padding = box(10.px)
-            backgroundColor += ColorConstants.BLACK_ALPHA_30
             alignment = Pos.CENTER
         }
 

@@ -34,6 +34,7 @@ class SettingViewModel : ViewModel() {
         override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) { saveSetting(apiKey) }
         override fun onImageDirectoryChanged(directory: ImageDirectory) { saveSetting(directory) }
         override fun onImageTransitionChanged(transition: ImageTransition) { saveSetting(transition) }
+        override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) { saveSetting(dateBackGround) }
     }
 
     /**
@@ -61,6 +62,7 @@ class SettingViewModel : ViewModel() {
                 is OpenWeatherApiKey -> preferencesDao.saveOpenWeatherAPIKey(settingItem)
                 is ImageDirectory -> preferencesDao.saveImageDirectory(settingItem)
                 is ImageTransition -> preferencesDao.saveImageTransition(settingItem)
+                is DateBackGround -> preferencesDao.saveDateBackground(settingItem)
             }
         }
     }

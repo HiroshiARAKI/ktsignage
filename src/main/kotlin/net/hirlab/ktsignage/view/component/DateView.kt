@@ -5,9 +5,10 @@
 package net.hirlab.ktsignage.view.component
 
 import javafx.scene.Group
+import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.data.Weather
-import net.hirlab.ktsignage.style.ColorConstants
 import net.hirlab.ktsignage.style.Theme
+import net.hirlab.ktsignage.util.backgroundColorStyle
 import net.hirlab.ktsignage.view.BaseView
 import net.hirlab.ktsignage.viewmodel.component.DateViewModel
 import tornadofx.*
@@ -29,16 +30,21 @@ class DateView : BaseView() {
     private val city = viewModel.cityString.stringBinding { it ?: "" }
 
     init {
+        val theme = Setting.dateBackgroundTheme.value
         root += vbox {
             addClass(Theme.date)
+            viewModel.backgroundColorStyleProperty = styleProperty()
+            style = backgroundColorStyle(theme.backgroundColor)
             label(viewModel.dateString) {
-                textFill = ColorConstants.WHITE
+                viewModel.textColorStyleProperties.add(textFillProperty())
+                textFill = theme.textColor
             }
             hbox {
                 addClass(Theme.weather)
                 label(city) {
                     addClass(Theme.city)
-                    textFill = ColorConstants.WHITE
+                    viewModel.textColorStyleProperties.add(textFillProperty())
+                    textFill = theme.textColor
                 }
                 imageview(viewModel.weatherIcon) {
                     fitWidth = 90.0
@@ -46,13 +52,20 @@ class DateView : BaseView() {
                 }
                 label(temp) {
                     addClass(Theme.marginLeftRight)
-                    textFill = ColorConstants.WHITE
+                    viewModel.textColorStyleProperties.add(textFillProperty())
+                    textFill = theme.textColor
                 }
                 vbox {
                     addClass(Theme.minMaxTemp)
                     addClass(Theme.marginLeftRight)
-                    label(maxTemp) { textFill = ColorConstants.WHITE }
-                    label(minTemp) { textFill = ColorConstants.WHITE }
+                    label(maxTemp).apply {
+                        viewModel.textColorStyleProperties.add(textFillProperty())
+                        textFill = theme.textColor
+                    }
+                    label(minTemp).apply {
+                        viewModel.textColorStyleProperties.add(textFillProperty())
+                        textFill = theme.textColor
+                    }
                 }
             }
         }

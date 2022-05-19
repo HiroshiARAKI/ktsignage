@@ -44,4 +44,9 @@ interface PreferencesDao {
      * Saves image [transition] to preferences data file.
      */
     suspend fun saveImageTransition(transition: ImageTransition)
+
+    /**
+     * Saves image [dateBackGround] to preferences data file.
+     */
+    suspend fun saveDateBackground(dateBackGround: DateBackGround)
 }

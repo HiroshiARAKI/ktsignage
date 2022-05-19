@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
 import javafx.scene.Group
+import javafx.scene.control.ColorPicker
 import javafx.scene.control.Label
 import javafx.util.StringConverter
 import kotlinx.coroutines.launch
@@ -82,6 +83,10 @@ class SettingFragment : Fragment(TITLE) {
                     openImageDirectorySetting()
                     null
                 }
+                DateBackGround::class -> {
+                    openDateBackgroundSetting()
+                    null
+                }
                 else -> null
             }?.toList() ?: return@onLeftClick
             updateSettingDetail(settingValues)
@@ -91,9 +96,7 @@ class SettingFragment : Fragment(TITLE) {
     private inline fun <reified T : SettingItem> updateSettingDetail(settingValues: List<T>) {
         val type = settingValues[0]::class
         settingDetail.replaceChildren(
-            flowpane {
-                hgap = 10.0
-                vgap = 10.0
+            vbox {
                 addClass(Theme.settingDetailContainer)
                 combobox (values = settingValues) {
                     converter = getConvertor<T>(type)
@@ -154,6 +157,29 @@ class SettingFragment : Fragment(TITLE) {
                     textProperty().onChange {
                         if (!it.isNullOrBlank())
                             viewModel.setImageDirectoryAfterDelay(it)
+                    }
+                }
+            }
+        )
+    }
+
+    private fun openDateBackgroundSetting() {
+        settingDetail.replaceChildren(
+            vbox {
+                hbox {
+                    label("Preinstall Theme: ")
+                    combobox (values = DateBackGround.values().toList()) {
+                        converter = getConvertor(DateBackGround::class)
+                        value = Setting.settingMap[DateBackGround::class] as DateBackGround?
+                        valueProperty().onChange { it?.select() }
+                    }
+                }
+                hbox {
+                    label("Background")
+                    ColorPicker().apply {
+                        setOnAction {
+                            value
+                        }
                     }
                 }
             }

@@ -51,6 +51,9 @@ class BackgroundImageViewModel : ViewModel() {
             Logger.d("$TAG#onImageTransitionChanged(): startImageSwitching with $transition")
             startImageSwitching()
         }
+        override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) {
+            //
+        }
     }
 
     init {

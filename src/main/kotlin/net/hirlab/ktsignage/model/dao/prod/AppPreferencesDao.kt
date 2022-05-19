@@ -12,6 +12,7 @@ import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.dao.PreferencesDao
 import net.hirlab.ktsignage.model.source.preferencesDataStore
 import net.hirlab.ktsignage.util.Logger
+import net.hirlab.ktsignage.util.toColor
 
 /**
  * Data access object for preferences for product.
@@ -29,6 +30,18 @@ class AppPreferencesDao : PreferencesDao {
         )
         Setting.openWeatherAPIKey = dataStore.getOrPut(OPEN_WEATHER_API_KEY, "")
         Setting.imageDirectory = dataStore.getOrPut(IMAGE_DIRECTORY, ResourceAccessor.imagePath)
+
+        val dateBackGround =
+            DateBackGround.valueOfOrDefault(dataStore.getOrPut(DATE_BACKGROUND, DateBackGround.DEFAULT.name))
+        if (dateBackGround == DateBackGround.CUSTOM) {
+            dateBackGround.value.apply {
+                backgroundColor = dataStore.get(DATE_BACKGROUND_COLOR)?.toColor()
+                    ?: DateBackGround.DEFAULT.value.backgroundColor
+                textColor = dataStore.get(DATE_TEXT_COLOR)?.toColor()
+                    ?: DateBackGround.DEFAULT.value.textColor
+            }
+        }
+        Setting.dateBackgroundTheme = dateBackGround
         Logger.d("$TAG.initialize: loaded preferences (${Setting.getLog()})")
 
     }
@@ -57,6 +70,14 @@ class AppPreferencesDao : PreferencesDao {
         dataStore.set(IMAGE_TRANSITION, transition.name)
     }
 
+    override suspend fun saveDateBackground(dateBackGround: DateBackGround) {
+        dataStore.run {
+            set(DATE_BACKGROUND, dateBackGround.name)
+            set(DATE_BACKGROUND_COLOR, "#${dateBackGround.value.backgroundColor}")
+            set(DATE_TEXT_COLOR, "#${dateBackGround.value.textColor}")
+        }
+    }
+
     companion object {
         private val TAG = AppPreferencesDao::class.java.simpleName
 
@@ -66,5 +87,8 @@ class AppPreferencesDao : PreferencesDao {
         private const val OPEN_WEATHER_API_KEY = "open_weather_api_key"
         private const val IMAGE_DIRECTORY = "image_directory"
         private const val IMAGE_TRANSITION = "image_transition"
+        private const val DATE_BACKGROUND = "date_background"
+        private const val DATE_BACKGROUND_COLOR = "date_background_color"
+        private const val DATE_TEXT_COLOR = "date_text_color"
     }
 }

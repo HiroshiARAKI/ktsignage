@@ -50,11 +50,20 @@ object Setting {
             Logger.d("$TAG.imageTransition is changed to $value")
         }
 
+    var dateBackgroundTheme = DateBackGround.DARK
+        set(value) {
+            field = value
+            settingMap[DateBackGround::class] = value
+            synchronized(lock) { listeners.forEach { it.onDateBackgroundThemeChanged(value) } }
+            Logger.d("$TAG.dateBackgroundTheme is changed to $value")
+        }
+
     val settingMap = mutableMapOf<KClass<out SettingItem>, SettingItem>(
         Language::class to lang,
         Location::class to location,
         DateFormat::class to dateFormat,
         ImageTransition::class to imageTransition,
+        DateBackGround::class to dateBackgroundTheme,
     )
 
     var openWeatherAPIKey = ""
@@ -91,5 +100,6 @@ object Setting {
         fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey)
         fun onImageDirectoryChanged(directory: ImageDirectory)
         fun onImageTransitionChanged(transition: ImageTransition)
+        fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround)
     }
 }

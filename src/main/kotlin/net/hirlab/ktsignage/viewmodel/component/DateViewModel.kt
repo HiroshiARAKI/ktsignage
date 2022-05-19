@@ -4,10 +4,9 @@
 
 package net.hirlab.ktsignage.viewmodel.component
 
-import javafx.beans.property.SimpleFloatProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import javafx.scene.image.Image
+import javafx.scene.paint.Paint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -15,6 +14,7 @@ import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.dao.WeatherDao
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.util.Logger
+import net.hirlab.ktsignage.util.backgroundColorStyle
 import net.hirlab.ktsignage.util.image
 import net.hirlab.ktsignage.util.runWithDelay
 import net.hirlab.ktsignage.viewmodel.ViewModel
@@ -32,6 +32,9 @@ class DateViewModel : ViewModel() {
     val maxTempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val minTempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val cityString = SimpleStringProperty()
+
+    lateinit var backgroundColorStyleProperty: StringProperty
+    val textColorStyleProperties = mutableListOf<ObjectProperty<Paint>>()
 
     private var formatter = getDateTimeFormatter()
 
@@ -66,6 +69,14 @@ class DateViewModel : ViewModel() {
 
         override fun onImageTransitionChanged(transition: ImageTransition) {
             // do nothing
+        }
+
+        override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) {
+            val theme = dateBackGround.value
+            backgroundColorStyleProperty.set(backgroundColorStyle(theme.backgroundColor))
+            textColorStyleProperties.forEach {
+                it.set(theme.textColor)
+            }
         }
     }
 
