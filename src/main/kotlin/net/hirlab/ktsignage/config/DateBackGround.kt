@@ -6,6 +6,7 @@ package net.hirlab.ktsignage.config
 
 import javafx.scene.paint.Color
 import net.hirlab.ktsignage.style.ColorConstants
+import net.hirlab.ktsignage.util.Logger
 
 enum class DateBackGround(override val itemName: String, override val value: Theme) : SettingItem {
     BLIGHT("Blight", Theme.BLIGHT_THEME),
@@ -13,6 +14,7 @@ enum class DateBackGround(override val itemName: String, override val value: The
     CUSTOM("Custom", Theme());
 
     override fun select() {
+        Logger.d("DateBackGround.select() $this(bg=${value.backgroundColor}, text=${value.textColor})")
         Setting.dateBackgroundTheme = this
     }
 

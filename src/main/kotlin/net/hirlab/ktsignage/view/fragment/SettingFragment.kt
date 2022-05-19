@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
 import javafx.scene.Group
 import javafx.scene.control.ColorPicker
+import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.util.StringConverter
 import kotlinx.coroutines.launch
@@ -164,23 +165,61 @@ class SettingFragment : Fragment(TITLE) {
     }
 
     private fun openDateBackgroundSetting() {
+        val currentTheme = Setting.dateBackgroundTheme.value
+        // Holds elements to change each values.
+        var combobox: ComboBox<DateBackGround>? = null
+        val bgColorPicker = ColorPicker(currentTheme.backgroundColor)
+        val textColorPicker = ColorPicker(currentTheme.textColor)
+
+        // When color pickers are used, changes the selected value of combo box to CUSTOM.
+        bgColorPicker.apply {
+            setOnAction {
+                combobox?.value = DateBackGround.CUSTOM
+                combobox?.value?.apply {
+                    value.backgroundColor = bgColorPicker.value
+                    value.textColor = textColorPicker.value
+                }?.select()
+            }
+        }
+        textColorPicker.apply {
+            setOnAction {
+                combobox?.value = DateBackGround.CUSTOM
+                combobox?.value?.apply {
+                    value.backgroundColor = bgColorPicker.value
+                    value.textColor = textColorPicker.value
+                }?.select()
+            }
+        }
+
         settingDetail.replaceChildren(
             vbox {
-                hbox {
-                    label("Preinstall Theme: ")
-                    combobox (values = DateBackGround.values().toList()) {
+                vbox {
+                    label("Preinstalled Theme: ")
+                    combobox = combobox (values = DateBackGround.values().toList()) {
                         converter = getConvertor(DateBackGround::class)
                         value = Setting.settingMap[DateBackGround::class] as DateBackGround?
-                        valueProperty().onChange { it?.select() }
-                    }
-                }
-                hbox {
-                    label("Background")
-                    ColorPicker().apply {
-                        setOnAction {
-                            value
+                        valueProperty().onChange {
+                            if (it == null) return@onChange
+                            if (it == DateBackGround.CUSTOM) {
+                                it.apply {
+                                    value.backgroundColor = bgColorPicker.value
+                                    value.textColor = textColorPicker.value
+                                }
+                            } else {
+                                bgColorPicker.value = it.value.backgroundColor
+                                textColorPicker.value = it.value.textColor
+                                it.select()
+                            }
                         }
                     }
+                }
+                vbox {
+                    label("Background Color")
+                    add(bgColorPicker)
+                }
+                vbox {
+                    label("Text Color")
+                    add(textColorPicker)
                 }
             }
         )
