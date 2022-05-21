@@ -4,19 +4,37 @@
 
 package net.hirlab.ktsignage.viewmodel.fragment
 
+import javafx.beans.property.SimpleObjectProperty
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.hirlab.ktsignage.MyApp
 import net.hirlab.ktsignage.config.*
+import net.hirlab.ktsignage.model.dao.CityDao
 import net.hirlab.ktsignage.model.dao.PreferencesDao
+import net.hirlab.ktsignage.model.data.City
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.viewmodel.ViewModel
+import tornadofx.asObservable
+import tornadofx.onChange
 
 class SettingViewModel : ViewModel() {
 
     private val preferencesDao: PreferencesDao by di()
+    private val cityDao: CityDao by di()
+
+    var currentCountry: Country = Setting.country
+        private set
+    var currentCity: City = Setting.city
+        private set
+
+    val cityListProperty = SimpleObjectProperty(emptyList<City>().asObservable())
+    var cityNameToId = mapOf<String, Int>()
+        private set
 
     /**
      * Queue to limit database access.
@@ -37,11 +55,24 @@ class SettingViewModel : ViewModel() {
         override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) { saveSetting(dateBackGround) }
     }
 
+    init {
+        cityListProperty.value.onChange { cities ->
+            cityNameToId = cities.list.toList().associateBy({ it.name }, { it.id })
+        }
+    }
+
     /**
      * Initializes this ViewModel.
      */
     fun initialize() {
         Setting.addListener(configListener)
+        viewModelScope.launch(Dispatchers.IO) {
+            val cities = cityDao.getCities(Setting.country.value) ?: return@launch
+            withContext(Dispatchers.JavaFx) {
+                cityListProperty.value = cities.asObservable()
+                Logger.d("$TAG.initialize(): Done loading cities=$cities")
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -87,6 +118,18 @@ class SettingViewModel : ViewModel() {
             Setting.imageDirectory = path
             Logger.d("setImageDirectoryAfterDelay(): save image directory ($path)")
         }
+    }
+
+    fun loadCities(country: Country) = viewModelScope.launch(Dispatchers.IO) {
+        val cities = cityDao.getCities(country.value) ?: return@launch
+        currentCountry = country
+        withContext(Dispatchers.JavaFx) {
+            cityListProperty.value = cities.asObservable()
+        }
+    }
+
+    fun selectCity(city: City) {
+        currentCity = city
     }
 
     private fun runAfterDelay(delayMillis: Long = 1000, func: () -> Unit) {

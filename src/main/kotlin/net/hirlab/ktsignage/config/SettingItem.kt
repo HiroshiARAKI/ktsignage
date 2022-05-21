@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
  */
 enum class Settings(val itemName: String, val item: KClass<out SettingItem>) {
     LANGUAGE("Language", Language::class),
-    LOCATION("Location", Location::class),
+    LOCATION("Location", Country::class),
     DATE_FORMAT("Date format", DateFormat::class),
     OPEN_WEATHER_API_KEY("OpenWeather API Key", OpenWeatherApiKey::class),
     IMAGE_DIRECTORY("Image directory", ImageDirectory::class),

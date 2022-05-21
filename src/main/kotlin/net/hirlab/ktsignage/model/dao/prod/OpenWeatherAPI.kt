@@ -22,17 +22,18 @@ class OpenWeatherAPI : WeatherDao {
     override suspend fun getCurrentWeather(): Weather? = withContext(Dispatchers.IO) {
         if (Setting.openWeatherAPIKey.isBlank()) return@withContext null
 
-        val url = "$URL?id=${Setting.location.value}&lang=${Setting.lang.code}&appid=${Setting.openWeatherAPIKey}"
+        val url = "$URL?id=${Setting.location.value.id}&lang=${Setting.lang.code}&appid=${Setting.openWeatherAPIKey}"
         val request = Request.Builder().url(url).build()
-        val response = client.newCall(request).execute()
-        if (!response.isSuccessful) {
-            Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-            WeatherDao.Status.setStatus(false, "Invalid API Key.")
-            // TODO: Handle error messages of OpenWeather API (#2)
-            return@withContext null
+        client.newCall(request).execute().let { response ->
+            if (!response.isSuccessful) {
+                Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
+                WeatherDao.Status.setStatus(false, "Invalid API Key.")
+                // TODO: Handle error messages of OpenWeather API (#2)
+                return@withContext null
+            }
+            WeatherDao.Status.setStatus(true, "Valid API Key!")
+            JSONObject(response.body!!.string()).toWeather()
         }
-        WeatherDao.Status.setStatus(true, "Valid API Key!")
-        JSONObject(response.body!!.string()).toWeather()
     }
 
     companion object {

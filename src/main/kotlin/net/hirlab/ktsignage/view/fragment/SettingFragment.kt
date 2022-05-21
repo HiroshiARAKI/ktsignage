@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 import net.hirlab.ktsignage.MyApp
 import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.dao.WeatherDao
+import net.hirlab.ktsignage.model.data.City
+import net.hirlab.ktsignage.model.data.cityStringConvertor
 import net.hirlab.ktsignage.style.ColorConstants
 import net.hirlab.ktsignage.style.Theme
 import net.hirlab.ktsignage.util.Logger
@@ -73,7 +75,7 @@ class SettingFragment : Fragment(TITLE) {
             Logger.d("${setting.name} is clicked. Launch detail items (${setting.item})")
             val settingValues = when (setting.item) {
                 Language::class -> Language.values()
-                Location::class -> Location.values()
+                Country::class -> Country.values()
                 DateFormat::class -> DateFormat.values()
                 ImageTransition::class -> ImageTransition.values()
                 OpenWeatherApiKey::class -> {
@@ -96,17 +98,42 @@ class SettingFragment : Fragment(TITLE) {
 
     private inline fun <reified T : SettingItem> updateSettingDetail(settingValues: List<T>) {
         val type = settingValues[0]::class
-        settingDetail.replaceChildren(
-            vbox {
-                addClass(Theme.settingDetailContainer)
-                combobox (values = settingValues) {
-                    converter = getConvertor<T>(type)
-                    Logger.d("type= $type")
-                    value = Setting.settingMap[type] as T?
-                    valueProperty().onChange { it?.select() }
+        val parentDetailVBox = vbox {
+            addClass(Theme.settingDetailContainer)
+            combobox (values = settingValues) {
+                converter = getConvertor<T>(type)
+                Logger.d("type= $type")
+                value = Setting.settingMap[type] as T?
+                valueProperty().onChange {
+                    if (it is Country) {
+                        viewModel.loadCities(it)
+                    } else {
+                        it?.select()
+                    }
                 }
             }
-        )
+            if (type == Country::class) {
+                combobox <City> {
+                    items = viewModel.cityListProperty.value
+                    value = Setting.city
+                    converter = cityStringConvertor(viewModel.cityNameToId)
+                    viewModel.cityListProperty.onChange {
+                        value = it?.get(0)
+                        items = it
+                        converter = cityStringConvertor(viewModel.cityNameToId)
+                    }
+                    valueProperty().onChange {
+                        if (it != null) viewModel.selectCity(it)
+                    }
+                }
+                button("Save") {
+                    action {
+                        Setting.location = Location.from(viewModel.currentCountry, viewModel.currentCity)
+                    }
+                }
+            }
+        }
+        settingDetail.replaceChildren(parentDetailVBox)
     }
 
     private fun openWithOpenWeatherAPISetting() {
@@ -247,7 +274,6 @@ class SettingFragment : Fragment(TITLE) {
                 if (string == null) return null
                 return when (type) {
                     Language::class -> Language.valueOfOrDefault(string)
-                    Location::class -> Location.valueOfOrDefault(string)
                     DateFormat::class -> DateFormat.valueOfOrDefault(string)
                     ImageTransition::class -> ImageTransition.valueOfOrDefault(string)
                     else -> null

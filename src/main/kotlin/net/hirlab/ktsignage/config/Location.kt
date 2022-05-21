@@ -4,21 +4,27 @@
 
 package net.hirlab.ktsignage.config
 
+import net.hirlab.ktsignage.model.data.City
+
 /**
  * Available locations.
  */
-enum class Location(override val itemName: String, override val value: String) : SettingItem {
-    YOKOHAMA("横浜", "1848354");
+data class Location(
+    val country: Country,
+    override val itemName: String,
+    override val value: City,
+) : SettingItem {
+    override fun select() {
+        Setting.location = this
+    }
 
-    override fun select() { Setting.location = this }
+    companion object {
+        val DEFAULT = from(Country.DEFAULT, City(id=1848354, name="Yokohama-shi"))
 
-    companion object : SettingItem.SettingItemCompanion{
-        override val DEFAULT = YOKOHAMA
-
-        override fun valueOfOrDefault(name: String) = try {
-            valueOf(name)
-        } catch (e: IllegalArgumentException) {
-            DEFAULT
-        }
+        fun from(country: Country, city: City) = Location(
+            country = country,
+            itemName = "${country.itemName}(city=$city)",
+            value = city,
+        )
     }
 }

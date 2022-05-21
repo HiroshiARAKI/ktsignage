@@ -4,6 +4,7 @@
 
 package net.hirlab.ktsignage.config
 
+import net.hirlab.ktsignage.model.data.City
 import net.hirlab.ktsignage.util.Logger
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -35,7 +36,11 @@ object Setting {
 
     var locale: Locale = Language.map[lang.code] ?: Locale.getDefault()
 
-    var location = Location.DEFAULT
+    var country = Country.JP
+
+    var city = City(id=1848354, name="Yokohama-shi")
+
+    var location = Location.from(country, city)
         set(value) {
             field = value
             settingMap[Location::class] = value
@@ -61,7 +66,7 @@ object Setting {
 
     val settingMap = mutableMapOf<KClass<out SettingItem>, SettingItem>(
         Language::class to lang,
-        Location::class to location,
+        Country::class to country,
         DateFormat::class to dateFormat,
         ImageTransition::class to imageTransition,
         DateBackGround::class to dateBackgroundTheme,
