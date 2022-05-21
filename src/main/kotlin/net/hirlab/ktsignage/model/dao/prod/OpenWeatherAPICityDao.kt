@@ -15,6 +15,9 @@ import net.hirlab.ktsignage.util.Logger
 import org.json.JSONObject
 import java.io.File
 
+/**
+ * Data access object of [City] that can be used on OpenWeather API.
+ */
 class OpenWeatherAPICityDao : CityDao {
     val applicationScope
         get() = MyApp.applicationScope
