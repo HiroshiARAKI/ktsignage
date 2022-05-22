@@ -12,6 +12,7 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.hirlab.ktsignage.config.*
+import net.hirlab.ktsignage.model.DirectoryObserver
 import net.hirlab.ktsignage.model.data.RingBuffer
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.util.image
@@ -29,6 +30,8 @@ class BackgroundImageViewModel : ViewModel() {
 
     private var imageSwitchingJob: Job? = null
 
+    private var imageDirectoryObservingJob: Job? = null
+
     private val mutex = Mutex()
 
     private val settingListener = object : Setting.Listener {
@@ -45,6 +48,10 @@ class BackgroundImageViewModel : ViewModel() {
             // do nothing
         }
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
+            if (imageSwitchingJob?.isActive == true) imageDirectoryObservingJob?.cancel()
+            imageDirectoryObservingJob = viewModelScope.launch {
+                DirectoryObserver.start(Setting.imageDirectory)
+            }
             initializeImages()
         }
         override fun onImageTransitionChanged(transition: ImageTransition) {
@@ -56,13 +63,20 @@ class BackgroundImageViewModel : ViewModel() {
         }
     }
 
+    private val directoryChangeListener = DirectoryObserver.Listener { kind, context ->
+        Logger.d("$TAG.directoryObserver: Gets event (kind=$kind, context=$context)")
+        initializeImages()
+    }
+
     init {
         Setting.addListener(settingListener)
+        DirectoryObserver.addListener(directoryChangeListener)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Setting.removeListener(settingListener)
+        DirectoryObserver.removeListener(directoryChangeListener)
     }
 
     /**

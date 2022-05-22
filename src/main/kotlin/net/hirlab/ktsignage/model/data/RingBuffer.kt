@@ -60,6 +60,10 @@ class RingBuffer<T>(items: List<T>){
         }
     }
 
+    override fun toString(): String {
+        return "RingBuffer(size=${items.size}, items=$items)"
+    }
+
     /**
      * Wrapper data class of previous, current and next items.
      */
