@@ -1,5 +1,8 @@
 # KtSignage
-Work in progress!!
+![code_size](https://img.shields.io/github/languages/code-size/HiroshiARAKI/ktsignage)
+![version](https://img.shields.io/badge/version-1.0.0-blue)
+
+This project is still in beta.
 
 KtSignage is a Simple smart display application worked on Kotlin.
 
@@ -29,7 +32,7 @@ KtSignage is designed based on MVVM (Model-View-ViewModel).
   * DAOs must have the own interfaces to debug easily
 
 ## LICENSE
-MIT License.
+[MIT License.](LICENSE.txt)
 
 ## Troubleshooting
 ### OpenJFX setting

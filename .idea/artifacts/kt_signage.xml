@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="kt-signage">
+    <output-path>$PROJECT_DIR$/out/artifacts/kt_signage</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="net.hirlab.ktsignage.MyApp" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="kt_signage.jar">
+        <element id="module-output" name="kt-signage" />
+      </element>
+    </root>
+  </artifact>
+</component>
