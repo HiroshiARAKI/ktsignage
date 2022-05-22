@@ -7,8 +7,10 @@ package net.hirlab.ktsignage.view.component
 import javafx.scene.Group
 import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.data.Weather
+import net.hirlab.ktsignage.style.Styles
 import net.hirlab.ktsignage.style.Theme
-import net.hirlab.ktsignage.util.backgroundColorStyle
+import net.hirlab.ktsignage.style.backgroundColor
+import net.hirlab.ktsignage.style.textColor
 import net.hirlab.ktsignage.view.BaseView
 import net.hirlab.ktsignage.viewmodel.component.DateViewModel
 import tornadofx.*
@@ -27,44 +29,41 @@ class DateView : BaseView() {
     private val minTemp = viewModel.minTempFloat.stringBinding {
         if (it.isValidTemp()) "min: $CELSIUS_FORMAT".format(it) else ""
     }
-    private val city = viewModel.cityString.stringBinding { it ?: "" }
 
     init {
         val theme = Setting.dateBackgroundTheme.value
         root += vbox {
-            addClass(Theme.date)
+            addClass(Theme.openSansFont)
             viewModel.backgroundColorStyleProperty = styleProperty()
-            style = backgroundColorStyle(theme.backgroundColor)
+            style += backgroundColor(theme.backgroundColor)
+            style += Styles.date
             label(viewModel.dateString) {
-                viewModel.textColorStyleProperties.add(textFillProperty())
+                viewModel.textColorStyleProperties.add(styleProperty())
                 textFill = theme.textColor
             }
             hbox {
-                addClass(Theme.weather)
-                label(city) {
-                    addClass(Theme.city)
-                    viewModel.textColorStyleProperties.add(textFillProperty())
-                    textFill = theme.textColor
+                style = Styles.weather
+                label(viewModel.cityString) {
+                    viewModel.textColorStyleProperties.add(styleProperty())
+                    style += Styles.city + textColor(theme.textColor)
                 }
                 imageview(viewModel.weatherIcon) {
                     fitWidth = 90.0
                     fitHeight = 90.0
                 }
                 label(temp) {
-                    addClass(Theme.marginLeftRight)
-                    viewModel.textColorStyleProperties.add(textFillProperty())
-                    textFill = theme.textColor
+                    viewModel.textColorStyleProperties.add(styleProperty())
+                    style += Styles.marginLeftRight + textColor(theme.textColor)
                 }
                 vbox {
-                    addClass(Theme.minMaxTemp)
-                    addClass(Theme.marginLeftRight)
+                    style = Styles.minMaxTemp + Styles.marginLeftRight
                     label(maxTemp).apply {
-                        viewModel.textColorStyleProperties.add(textFillProperty())
-                        textFill = theme.textColor
+                        viewModel.textColorStyleProperties.add(styleProperty())
+                        style += textColor(theme.textColor)
                     }
                     label(minTemp).apply {
-                        viewModel.textColorStyleProperties.add(textFillProperty())
-                        textFill = theme.textColor
+                        viewModel.textColorStyleProperties.add(styleProperty())
+                        style += textColor(theme.textColor)
                     }
                 }
             }

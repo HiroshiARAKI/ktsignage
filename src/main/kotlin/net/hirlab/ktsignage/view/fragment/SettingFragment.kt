@@ -19,7 +19,9 @@ import net.hirlab.ktsignage.model.dao.WeatherDao
 import net.hirlab.ktsignage.model.data.City
 import net.hirlab.ktsignage.model.data.cityStringConvertor
 import net.hirlab.ktsignage.style.ColorConstants
+import net.hirlab.ktsignage.style.Styles
 import net.hirlab.ktsignage.style.Theme
+import net.hirlab.ktsignage.style.hoverOpacity
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.viewmodel.fragment.SettingViewModel
 import tornadofx.*
@@ -34,16 +36,17 @@ class SettingFragment : Fragment(TITLE) {
     private val viewModel: SettingViewModel by inject()
 
     private val settingList = vbox {
-        addClass(Theme.settingItemContainer)
+        style = Styles.settingFragmentLeftArea
         Settings.values().forEach { settingItem(it) }
     }
 
     private val settingDetail = vbox {
-        addClass(Theme.settingDetailContainer)
+        style = Styles.settingfFragmentRightArea
     }
 
     private val container = hbox {
-        addClass(Theme.settingRootContainer)
+        addClass(Theme.openSansFont)
+        style += Styles.settingFragmentContainer
         add(settingList)
         add(settingDetail)
     }
@@ -70,7 +73,8 @@ class SettingFragment : Fragment(TITLE) {
     }
 
     private fun EventTarget.settingItem(setting: Settings) = label(setting.itemName) {
-        addClass(Theme.settingItem)
+        style = Styles.settingMainItem
+        hoverOpacity(0.7)
         onLeftClick {
             Logger.d("${setting.name} is clicked. Launch detail items (${setting.item})")
             val settingValues = when (setting.item) {
@@ -92,41 +96,58 @@ class SettingFragment : Fragment(TITLE) {
                 }
                 else -> null
             }?.toList() ?: return@onLeftClick
-            updateSettingDetail(settingValues)
+            updateSettingDetail(setting.itemName, settingValues)
         }
     }
 
-    private inline fun <reified T : SettingItem> updateSettingDetail(settingValues: List<T>) {
+    private inline fun <reified T : SettingItem> updateSettingDetail(title: String, settingValues: List<T>) {
         val type = settingValues[0]::class
         val parentDetailVBox = vbox {
-            addClass(Theme.settingDetailContainer)
-            combobox (values = settingValues) {
-                converter = getConvertor<T>(type)
-                Logger.d("type= $type")
-                value = Setting.settingMap[type] as T?
-                valueProperty().onChange {
-                    if (it is Country) {
-                        viewModel.loadCities(it)
-                    } else {
-                        it?.select()
+            vbox {
+                spacing = 5.0
+                style = Styles.componentBlock
+                label(title) { style = Styles.settingTitle }
+                if (type == Country::class) {
+                    label("Country") { style = Styles.settingSubTitle }
+                }
+                combobox (values = settingValues) {
+                    style = Styles.settingInput
+                    converter = getConvertor<T>(type)
+                    Logger.d("type= $type")
+                    value = Setting.settingMap[type] as T?
+                    valueProperty().onChange {
+                        if (it is Country) {
+                            viewModel.loadCities(it)
+                        } else {
+                            it?.select()
+                        }
                     }
                 }
             }
+
             if (type == Country::class) {
-                combobox <City> {
-                    items = viewModel.cityListProperty.value
-                    value = Setting.city
-                    converter = cityStringConvertor(viewModel.cityNameToId)
-                    viewModel.cityListProperty.onChange {
-                        value = it?.get(0)
-                        items = it
+                vbox {
+                    spacing = 5.0
+                    style = Styles.componentBlock
+                    label("City") { style = Styles.settingSubTitle }
+                    combobox <City> {
+                        style = Styles.settingInput
+                        items = viewModel.cityListProperty.value
+                        value = Setting.city
                         converter = cityStringConvertor(viewModel.cityNameToId)
-                    }
-                    valueProperty().onChange {
-                        if (it != null) viewModel.selectCity(it)
+                        viewModel.cityListProperty.onChange {
+                            value = it?.get(0)
+                            items = it
+                            converter = cityStringConvertor(viewModel.cityNameToId)
+                        }
+                        valueProperty().onChange {
+                            if (it != null) viewModel.selectCity(it)
+                        }
                     }
                 }
                 button("Save") {
+                    style = Styles.settingButton
+                    hoverOpacity(0.7)
                     action {
                         Setting.location = Location.from(viewModel.currentCountry, viewModel.currentCity)
                     }
@@ -139,10 +160,10 @@ class SettingFragment : Fragment(TITLE) {
     private fun openWithOpenWeatherAPISetting() {
         settingDetail.replaceChildren(
             vbox {
-                addClass(Theme.settingInput)
-                label("Your OpenWeather API Key:")
+                style = Styles.settingInput
+                label("Your OpenWeather API Key") { style = Styles.settingSubTitle }
                 textfield {
-                    addClass(Theme.textSmaller)
+                    style = Styles.textSmaller
                     text = Setting.openWeatherAPIKey
                     textProperty().onChange {
                         if (!it.isNullOrBlank())
@@ -156,7 +177,7 @@ class SettingFragment : Fragment(TITLE) {
                     }
                 }
                 textflow {
-                    addClass(Theme.marginTopBottom)
+                    style = Styles.componentBlock
                     text("See")
                     hyperlink("this link") {
                         action { hostServices.showDocument("https://openweathermap.org/") }
@@ -170,10 +191,10 @@ class SettingFragment : Fragment(TITLE) {
     private fun openImageDirectorySetting() {
         settingDetail.replaceChildren(
             vbox {
-                addClass(Theme.settingInput)
-                label("Image directory:")
+                style = Styles.settingInput
+                label("Image directory") { style = Styles.settingSubTitle }
                 button {
-                    addClass(Theme.textSmaller)
+                    style = Styles.textSmaller
                     text = Setting.imageDirectory
                     action {
                         chooseDirectory(
@@ -220,6 +241,7 @@ class SettingFragment : Fragment(TITLE) {
 
         settingDetail.replaceChildren(
             vbox {
+                spacing = 15.0
                 vbox {
                     label("Preinstalled Theme: ")
                     combobox = combobox (values = DateBackGround.values().toList()) {

@@ -6,9 +6,6 @@ package net.hirlab.ktsignage.util
 
 import javafx.scene.paint.Color
 import tornadofx.c
-import tornadofx.css
-
-fun backgroundColorStyle(color: Color) = "-fx-background-color: ${color.css};"
 
 fun String.toColor(): Color {
     var code = this

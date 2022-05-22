@@ -11,7 +11,7 @@ import javafx.stage.StageStyle
 import kotlinx.coroutines.launch
 import net.hirlab.ktsignage.MyApp
 import net.hirlab.ktsignage.model.dao.PreferencesDao
-import net.hirlab.ktsignage.style.Theme
+import net.hirlab.ktsignage.style.Styles
 import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.view.component.BackGroundImageView
 import net.hirlab.ktsignage.view.component.DateView
@@ -41,7 +41,7 @@ class MainView : BaseView(TITLE) {
     private val container = vbox {
         prefWidth = primaryStage.width
         prefHeight = primaryStage.height
-        addClass(Theme.base)
+        style = Styles.root
 
         spacer {  }
         add(dateView.root)
