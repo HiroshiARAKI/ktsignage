@@ -48,8 +48,8 @@ class DateView : BaseView() {
                     style += Styles.city + textColor(theme.textColor)
                 }
                 imageview(viewModel.weatherIcon) {
-                    fitWidth = 90.0
-                    fitHeight = 90.0
+                    fitWidth = 120.0
+                    fitHeight = 120.0
                 }
                 label(temp) {
                     viewModel.textColorStyleProperties.add(styleProperty())
