@@ -6,8 +6,21 @@ package net.hirlab.ktsignage.model.dao
 
 import net.hirlab.ktsignage.model.data.Weather
 
+/**
+ * Data access object to handle weather data.
+ */
 interface WeatherDao {
+    /**
+     * Gets current weather.
+     * @return [Weather] data if exists, otherwise `null`
+     */
     suspend fun getCurrentWeather(): Weather?
+
+    /**
+     * Gets 5 days weathers.
+     * @return List of [Weather] if exists, otherwise [emptyList]
+     */
+    suspend fun get5DaysWeather(): List<Weather>
 
     /**
      * OpenWeather API access status.
