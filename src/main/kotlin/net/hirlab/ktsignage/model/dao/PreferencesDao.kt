@@ -49,4 +49,9 @@ interface PreferencesDao {
      * Saves image [dateBackGround] to preferences data file.
      */
     suspend fun saveDateBackground(dateBackGround: DateBackGround)
+
+    /**
+     * Saves image [dateViewSize] to preferences data file.
+     */
+    suspend fun saveDateViewSize(dateViewSize: DateViewSize)
 }

@@ -5,12 +5,12 @@
 package net.hirlab.ktsignage.view.component
 
 import javafx.scene.Group
-import net.hirlab.ktsignage.config.Setting
+import javafx.scene.shape.SVGPath
+import javafx.scene.transform.Scale
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.style.Styles
 import net.hirlab.ktsignage.style.Theme
-import net.hirlab.ktsignage.style.backgroundColor
-import net.hirlab.ktsignage.style.textColor
+import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.view.BaseView
 import net.hirlab.ktsignage.viewmodel.component.DateViewModel
 import tornadofx.*
@@ -30,43 +30,64 @@ class DateView : BaseView() {
         if (it.isValidTemp()) "min: $CELSIUS_FORMAT".format(it) else ""
     }
 
+    private var iconSvgPath: SVGPath? = null
+
+    private var lastScaling: Scale? = null
+
     init {
-        val theme = Setting.dateBackgroundTheme.value
-        root += vbox {
+        viewModel.weatherIconSvg.onChange {
+            if (it == null || iconSvgPath == null) return@onChange
+            iconSvgPath!!.content = it
+        }
+        val container = vbox {
             addClass(Theme.openSansFont)
-            viewModel.backgroundColorStyleProperty = styleProperty()
-            style += backgroundColor(theme.backgroundColor)
-            style += Styles.date
+            backgroundProperty().bind(viewModel.backgroundColorProperty)
+            style = Styles.date
             label(viewModel.dateString) {
-                viewModel.textColorStyleProperties.add(styleProperty())
-                textFill = theme.textColor
+                textFillProperty().bind(viewModel.textColorProperty)
             }
-            hbox {
+            hbox(spacing = 10) {
                 style = Styles.weather
                 label(viewModel.cityString) {
-                    viewModel.textColorStyleProperties.add(styleProperty())
-                    style += Styles.city + textColor(theme.textColor)
+                    textFillProperty().bind(viewModel.textColorProperty)
+                    style = Styles.city
                 }
-                imageview(viewModel.weatherIcon) {
-                    fitWidth = 90.0
-                    fitHeight = 90.0
+                group {
+                    iconSvgPath = svgpath {
+                        content = viewModel.weatherIconSvg.value ?: ""
+                        fillProperty().bind(viewModel.textColorProperty)
+                        strokeProperty().bind(viewModel.textColorProperty)
+                        scaleX = 0.2
+                        scaleY = 0.2
+                    }
                 }
+
                 label(temp) {
-                    viewModel.textColorStyleProperties.add(styleProperty())
-                    style += Styles.marginLeftRight + textColor(theme.textColor)
+                    textFillProperty().bind(viewModel.textColorProperty)
+                    style = Styles.marginLeftRight
                 }
                 vbox {
                     style = Styles.minMaxTemp + Styles.marginLeftRight
                     label(maxTemp).apply {
-                        viewModel.textColorStyleProperties.add(styleProperty())
-                        style += textColor(theme.textColor)
+                        textFillProperty().bind(viewModel.textColorProperty)
                     }
                     label(minTemp).apply {
-                        viewModel.textColorStyleProperties.add(styleProperty())
-                        style += textColor(theme.textColor)
+                        textFillProperty().bind(viewModel.textColorProperty)
                     }
                 }
             }
+        }
+        root += container
+        viewModel.rootScaleProperty.onChange {
+            Logger.d("rootScaleProperty.onChange ${container.height}")
+            if (lastScaling != null)
+                root.transforms.remove(lastScaling)
+            // If the container has not shown on primaryStage, container.height returns 0.0.
+            // So, at the first time, uses the assumed height.
+            // TODO: Fix this logic.
+            val pivotY = if (container.height == 0.0) 245.0 else container.height
+            lastScaling = Scale(it, it, 0.0, pivotY)
+            root.transforms.add(lastScaling)
         }
     }
 

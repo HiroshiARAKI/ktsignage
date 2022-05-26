@@ -19,23 +19,23 @@ object Styles {
     }
 
     val date = cssStyleBlock {
-        + fontSize(ROOT_FONT_SIZE * 3.5)
+        + fontSize(ROOT_FONT_SIZE * 4)
         + padding(10)
         + textAlign(TextAlignment.CENTER)
     }
 
     val city = cssStyleBlock {
-        + fontSize(ROOT_FONT_SIZE * 1.8)
+        + fontSize(ROOT_FONT_SIZE * 3)
     }
 
     val weather = cssStyleBlock {
-        + fontSize(ROOT_FONT_SIZE * 3.0)
+        + fontSize(ROOT_FONT_SIZE * 4)
         + textAlign(TextAlignment.CENTER)
         + padding(10)
     }
 
     val minMaxTemp = cssStyleBlock {
-        + fontSize(ROOT_FONT_SIZE * 1.2)
+        + fontSize(ROOT_FONT_SIZE * 1.4)
         + textAlign(TextAlignment.CENTER)
     }
 

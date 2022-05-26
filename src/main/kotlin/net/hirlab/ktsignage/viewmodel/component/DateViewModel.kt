@@ -4,22 +4,22 @@
 
 package net.hirlab.ktsignage.viewmodel.component
 
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleFloatProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
-import javafx.scene.image.Image
+import javafx.scene.paint.Paint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import net.hirlab.ktsignage.ResourceAccessor
 import net.hirlab.ktsignage.config.*
 import net.hirlab.ktsignage.model.dao.WeatherDao
 import net.hirlab.ktsignage.model.data.Weather
-import net.hirlab.ktsignage.style.backgroundColor
-import net.hirlab.ktsignage.style.textColor
 import net.hirlab.ktsignage.util.Logger
-import net.hirlab.ktsignage.util.image
+import net.hirlab.ktsignage.util.SvgParser
 import net.hirlab.ktsignage.util.runWithDelay
+import net.hirlab.ktsignage.util.simpleBackgroundOf
 import net.hirlab.ktsignage.viewmodel.ViewModel
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -28,15 +28,19 @@ import java.util.concurrent.TimeUnit
 class DateViewModel : ViewModel() {
     private val weatherRepository: WeatherDao by di()
 
+    val rootScaleProperty = SimpleDoubleProperty(DateViewSize.DEFAULT.value)
+
     val dateString = SimpleStringProperty("")
-    val weatherIcon = SimpleObjectProperty<Image>()
+    val weatherIconSvg = SimpleStringProperty()
     val tempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val maxTempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val minTempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val cityString = SimpleStringProperty()
 
-    lateinit var backgroundColorStyleProperty: StringProperty
-    val textColorStyleProperties = mutableListOf<StringProperty>()
+    val backgroundColorProperty = SimpleObjectProperty(
+        simpleBackgroundOf(Setting.dateBackgroundTheme.value.backgroundColor)
+    )
+    val textColorProperty = SimpleObjectProperty<Paint>(Setting.dateBackgroundTheme.value.textColor)
 
     private var formatter = Setting.getDateTimeFormatter()
 
@@ -75,14 +79,12 @@ class DateViewModel : ViewModel() {
 
         override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) {
             val theme = dateBackGround.value
-            backgroundColorStyleProperty.set(
-                backgroundColorStyleProperty.value + backgroundColor(theme.backgroundColor)
-            )
-            textColorStyleProperties.forEach {
-                it.set(
-                    it.value + textColor(theme.textColor)
-                )
-            }
+            textColorProperty.value = theme.textColor
+            backgroundColorProperty.value = simpleBackgroundOf(theme.backgroundColor)
+        }
+
+        override fun onDateViewSizeChanged(dateViewSize: DateViewSize) {
+            rootScaleProperty.set(dateViewSize.value)
         }
     }
 
@@ -120,7 +122,8 @@ class DateViewModel : ViewModel() {
         val weather = weatherRepository.getCurrentWeather()
         Logger.d("Current weather is $weather")
         if (weather != null) {
-            weatherIcon.value = image("https://openweathermap.org/img/wn/${weather.icon}@2x.png")
+            weatherIconSvg.value =
+                SvgParser.getPath("${ResourceAccessor.openWeatherIconsPath}src/svg/${weather.icon}.svg")
             tempFloat.value = weather.temp.toCelsius()
             maxTempFloat.value = weather.maxTemp.toCelsius()
             minTempFloat.value = weather.minTemp.toCelsius()

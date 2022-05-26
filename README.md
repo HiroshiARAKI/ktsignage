@@ -1,6 +1,6 @@
 # KtSignage
 ![code_size](https://img.shields.io/github/languages/code-size/HiroshiARAKI/ktsignage)
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![version](https://img.shields.io/badge/version-1.1.0-blue)
 
 This project is still in beta.
 
@@ -15,6 +15,9 @@ $ ./gradlew run
 ## Screenshots
 Whole view
 ![screenshot1](screenshots/screenshot1.png)
+
+Setting view
+![screenshot1](screenshots/screenshot2.png)
 
 ## Application design
 KtSignage is designed based on MVVM (Model-View-ViewModel).

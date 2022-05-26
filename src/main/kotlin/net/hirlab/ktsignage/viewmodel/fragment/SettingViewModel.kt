@@ -53,6 +53,7 @@ class SettingViewModel : ViewModel() {
         override fun onImageDirectoryChanged(directory: ImageDirectory) { saveSetting(directory) }
         override fun onImageTransitionChanged(transition: ImageTransition) { saveSetting(transition) }
         override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) { saveSetting(dateBackGround) }
+        override fun onDateViewSizeChanged(dateViewSize: DateViewSize) { saveSetting(dateViewSize) }
     }
 
     init {
@@ -94,6 +95,7 @@ class SettingViewModel : ViewModel() {
                 is ImageDirectory -> preferencesDao.saveImageDirectory(settingItem)
                 is ImageTransition -> preferencesDao.saveImageTransition(settingItem)
                 is DateBackGround -> preferencesDao.saveDateBackground(settingItem)
+                is DateViewSize -> preferencesDao.saveDateViewSize(settingItem)
             }
         }
     }

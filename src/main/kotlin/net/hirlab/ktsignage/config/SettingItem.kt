@@ -18,6 +18,7 @@ enum class Settings(val itemName: String, val item: KClass<out SettingItem>) {
     IMAGE_DIRECTORY("Image directory", ImageDirectory::class),
     IMAGE_TRANSITION("Background transition time", ImageTransition::class),
     DATE_BACKGROUND("Date background setting", DateBackGround::class),
+    DATE_VIEW_SCALE("Date view size", DateViewSize::class),
 }
 
 /**

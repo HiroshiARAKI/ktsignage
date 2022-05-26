@@ -1,0 +1,3 @@
+[submodule "src/main/resources/sys/open_weather_icons"]
+	path = src/main/resources/sys/open_weather_icons
+	url = https://github.com/isneezy/open-weather-icons.git

@@ -43,6 +43,8 @@ class AppPreferencesDao : PreferencesDao {
             }
         }
         Setting.dateBackgroundTheme = dateBackGround
+        Setting.dateViewSize =
+            DateViewSize.valueOfOrDefault(dataStore.getOrPut(DATE_VIEW_SIZE, DateViewSize.DEFAULT.name))
         Logger.d("$TAG.initialize: loaded preferences (${Setting.getLog()})")
 
     }
@@ -83,6 +85,10 @@ class AppPreferencesDao : PreferencesDao {
         }
     }
 
+    override suspend fun saveDateViewSize(dateViewSize: DateViewSize) {
+        dataStore.set(DATE_VIEW_SIZE, dateViewSize.name)
+    }
+
     private fun getLocation(): Location {
         val country = Country.valueOfOrDefault(dataStore.getOrPut(COUNTRY, Country.DEFAULT.name))
         val city = City(
@@ -106,5 +112,6 @@ class AppPreferencesDao : PreferencesDao {
         private const val DATE_BACKGROUND = "date_background"
         private const val DATE_BACKGROUND_COLOR = "date_background_color"
         private const val DATE_TEXT_COLOR = "date_text_color"
+        private const val DATE_VIEW_SIZE = "date_view_size"
     }
 }

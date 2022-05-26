@@ -4,6 +4,8 @@
 
 package net.hirlab.ktsignage.util
 
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
 import javafx.scene.paint.Color
 import tornadofx.c
 
@@ -18,3 +20,5 @@ fun String.toColor(): Color {
         code.substring(6..7).toInt(16) / 255.0
     )
 }
+
+fun simpleBackgroundOf(color: Color) = Background(BackgroundFill(color, null, null))
