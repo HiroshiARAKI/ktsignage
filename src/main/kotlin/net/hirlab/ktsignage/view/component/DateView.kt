@@ -5,12 +5,10 @@
 package net.hirlab.ktsignage.view.component
 
 import javafx.scene.Group
-import net.hirlab.ktsignage.config.Setting
+import javafx.scene.shape.SVGPath
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.style.Styles
 import net.hirlab.ktsignage.style.Theme
-import net.hirlab.ktsignage.style.backgroundColor
-import net.hirlab.ktsignage.style.textColor
 import net.hirlab.ktsignage.view.BaseView
 import net.hirlab.ktsignage.viewmodel.component.DateViewModel
 import tornadofx.*
@@ -30,40 +28,47 @@ class DateView : BaseView() {
         if (it.isValidTemp()) "min: $CELSIUS_FORMAT".format(it) else ""
     }
 
+    private var iconSvgPath: SVGPath? = null
+
     init {
-        val theme = Setting.dateBackgroundTheme.value
+        viewModel.weatherIconSvg.onChange {
+            if (it == null || iconSvgPath == null) return@onChange
+            iconSvgPath!!.content = it
+        }
         root += vbox {
             addClass(Theme.openSansFont)
-            viewModel.backgroundColorStyleProperty = styleProperty()
-            style += backgroundColor(theme.backgroundColor)
-            style += Styles.date
+            backgroundProperty().bind(viewModel.backgroundColorProperty)
+            style = Styles.date
             label(viewModel.dateString) {
-                viewModel.textColorStyleProperties.add(styleProperty())
-                textFill = theme.textColor
+                textFillProperty().bind(viewModel.textColorProperty)
             }
-            hbox {
+            hbox(spacing = 10) {
                 style = Styles.weather
                 label(viewModel.cityString) {
-                    viewModel.textColorStyleProperties.add(styleProperty())
-                    style += Styles.city + textColor(theme.textColor)
+                    textFillProperty().bind(viewModel.textColorProperty)
+                    style = Styles.city
                 }
-                imageview(viewModel.weatherIcon) {
-                    fitWidth = 120.0
-                    fitHeight = 120.0
+                group {
+                    iconSvgPath = svgpath {
+                        content = viewModel.weatherIconSvg.value
+                        fillProperty().bind(viewModel.textColorProperty)
+                        strokeProperty().bind(viewModel.textColorProperty)
+                        scaleX = 0.2
+                        scaleY = 0.2
+                    }
                 }
+
                 label(temp) {
-                    viewModel.textColorStyleProperties.add(styleProperty())
-                    style += Styles.marginLeftRight + textColor(theme.textColor)
+                    textFillProperty().bind(viewModel.textColorProperty)
+                    style = Styles.marginLeftRight
                 }
                 vbox {
                     style = Styles.minMaxTemp + Styles.marginLeftRight
                     label(maxTemp).apply {
-                        viewModel.textColorStyleProperties.add(styleProperty())
-                        style += textColor(theme.textColor)
+                        textFillProperty().bind(viewModel.textColorProperty)
                     }
                     label(minTemp).apply {
-                        viewModel.textColorStyleProperties.add(styleProperty())
-                        style += textColor(theme.textColor)
+                        textFillProperty().bind(viewModel.textColorProperty)
                     }
                 }
             }

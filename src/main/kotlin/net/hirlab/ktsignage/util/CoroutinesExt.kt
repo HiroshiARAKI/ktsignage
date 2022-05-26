@@ -21,4 +21,7 @@ suspend fun CoroutineScope.runWithDelay(timeMillis: Long, block: suspend () -> U
 /**
  * Loads [Image] with IO thread.
  */
-suspend fun image(url: String) = withContext(Dispatchers.IO) { Image(url) }
+suspend fun image(url: String) = withContext(Dispatchers.IO) {
+    Logger.d("image(url=$url)")
+    Image(url)
+}
