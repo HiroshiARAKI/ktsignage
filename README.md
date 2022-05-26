@@ -16,6 +16,9 @@ $ ./gradlew run
 Whole view
 ![screenshot1](screenshots/screenshot1.png)
 
+Setting view
+![screenshot1](screenshots/screenshot2.png)
+
 ## Application design
 KtSignage is designed based on MVVM (Model-View-ViewModel).
 ![design](screenshots/design.png)
