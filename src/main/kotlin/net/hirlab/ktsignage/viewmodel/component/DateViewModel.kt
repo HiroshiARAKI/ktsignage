@@ -4,6 +4,7 @@
 
 package net.hirlab.ktsignage.viewmodel.component
 
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleFloatProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -26,6 +27,8 @@ import java.util.concurrent.TimeUnit
 
 class DateViewModel : ViewModel() {
     private val weatherRepository: WeatherDao by di()
+
+    val rootScaleProperty = SimpleDoubleProperty(DateViewSize.DEFAULT.value)
 
     val dateString = SimpleStringProperty("")
     val weatherIconSvg = SimpleStringProperty()
@@ -78,6 +81,10 @@ class DateViewModel : ViewModel() {
             val theme = dateBackGround.value
             textColorProperty.value = theme.textColor
             backgroundColorProperty.value = simpleBackgroundOf(theme.backgroundColor)
+        }
+
+        override fun onDateViewSizeChanged(dateViewSize: DateViewSize) {
+            rootScaleProperty.set(dateViewSize.value)
         }
     }
 

@@ -94,6 +94,7 @@ class SettingFragment : Fragment(TITLE) {
                     openDateBackgroundSetting()
                     null
                 }
+                DateViewSize::class -> DateViewSize.values()
                 else -> null
             }?.toList() ?: return@onLeftClick
             updateSettingDetail(setting.itemName, settingValues)

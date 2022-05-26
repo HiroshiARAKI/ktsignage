@@ -6,9 +6,11 @@ package net.hirlab.ktsignage.view.component
 
 import javafx.scene.Group
 import javafx.scene.shape.SVGPath
+import javafx.scene.transform.Scale
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.style.Styles
 import net.hirlab.ktsignage.style.Theme
+import net.hirlab.ktsignage.util.Logger
 import net.hirlab.ktsignage.view.BaseView
 import net.hirlab.ktsignage.viewmodel.component.DateViewModel
 import tornadofx.*
@@ -30,12 +32,14 @@ class DateView : BaseView() {
 
     private var iconSvgPath: SVGPath? = null
 
+    private var lastScaling: Scale? = null
+
     init {
         viewModel.weatherIconSvg.onChange {
             if (it == null || iconSvgPath == null) return@onChange
             iconSvgPath!!.content = it
         }
-        root += vbox {
+        val container = vbox {
             addClass(Theme.openSansFont)
             backgroundProperty().bind(viewModel.backgroundColorProperty)
             style = Styles.date
@@ -50,7 +54,7 @@ class DateView : BaseView() {
                 }
                 group {
                     iconSvgPath = svgpath {
-                        content = viewModel.weatherIconSvg.value
+                        content = viewModel.weatherIconSvg.value ?: ""
                         fillProperty().bind(viewModel.textColorProperty)
                         strokeProperty().bind(viewModel.textColorProperty)
                         scaleX = 0.2
@@ -72,6 +76,18 @@ class DateView : BaseView() {
                     }
                 }
             }
+        }
+        root += container
+        viewModel.rootScaleProperty.onChange {
+            Logger.d("rootScaleProperty.onChange ${container.height}")
+            if (lastScaling != null)
+                root.transforms.remove(lastScaling)
+            // If the container has not shown on primaryStage, container.height returns 0.0.
+            // So, at the first time, uses the assumed height.
+            // TODO: Fix this logic.
+            val pivotY = if (container.height == 0.0) 245.0 else container.height
+            lastScaling = Scale(it, it, 0.0, pivotY)
+            root.transforms.add(lastScaling)
         }
     }
 

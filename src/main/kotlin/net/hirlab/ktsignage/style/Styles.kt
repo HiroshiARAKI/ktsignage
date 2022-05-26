@@ -25,11 +25,11 @@ object Styles {
     }
 
     val city = cssStyleBlock {
-        + fontSize(ROOT_FONT_SIZE * 2.7)
+        + fontSize(ROOT_FONT_SIZE * 3)
     }
 
     val weather = cssStyleBlock {
-        + fontSize(ROOT_FONT_SIZE * 3.7)
+        + fontSize(ROOT_FONT_SIZE * 4)
         + textAlign(TextAlignment.CENTER)
         + padding(10)
     }

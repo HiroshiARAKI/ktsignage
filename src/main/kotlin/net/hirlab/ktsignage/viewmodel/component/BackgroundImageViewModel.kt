@@ -59,7 +59,10 @@ class BackgroundImageViewModel : ViewModel() {
             startImageSwitching()
         }
         override fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround) {
-            //
+            // do noting
+        }
+        override fun onDateViewSizeChanged(dateViewSize: DateViewSize) {
+            // do nothing
         }
     }
 

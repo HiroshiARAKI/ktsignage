@@ -34,6 +34,8 @@ fun maxWidth(px: Int) = "-fx-max-width: ${px}px;"
 
 fun minHeight(px: Int) = "-fx-min-height: ${px}px;"
 
+fun maxHeight(px: Int) = "-fx-max-height: ${px}px;"
+
 fun backgroundColor(color: Color) = "-fx-background-color: ${color.css};"
 
 fun fontSize(px: Number) = "-fx-font-size: ${px}px;"

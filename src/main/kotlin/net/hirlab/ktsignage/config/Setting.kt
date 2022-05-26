@@ -64,12 +64,21 @@ object Setting {
             Logger.d("$TAG.dateBackgroundTheme is changed to $value")
         }
 
+    var dateViewSize = DateViewSize.DEFAULT
+        set(value) {
+            field = value
+            settingMap[DateViewSize::class] = value
+            synchronized(lock) { listeners.forEach { it.onDateViewSizeChanged(value) } }
+            Logger.d("$TAG.dateViewSize is changed to $value")
+        }
+
     val settingMap = mutableMapOf<KClass<out SettingItem>, SettingItem>(
         Language::class to lang,
         Country::class to country,
         DateFormat::class to dateFormat,
         ImageTransition::class to imageTransition,
         DateBackGround::class to dateBackgroundTheme,
+        DateViewSize::class to dateViewSize,
     )
 
     var openWeatherAPIKey = ""
@@ -109,5 +118,6 @@ object Setting {
         fun onImageDirectoryChanged(directory: ImageDirectory)
         fun onImageTransitionChanged(transition: ImageTransition)
         fun onDateBackgroundThemeChanged(dateBackGround: DateBackGround)
+        fun onDateViewSizeChanged(dateViewSize: DateViewSize)
     }
 }
