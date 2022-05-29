@@ -12,10 +12,10 @@ import org.junit.Test
 
 class SvgParserTest {
     @Test
-    fun getPath() = runBlocking {
+    fun `getPath - 01d`() = runBlocking {
         val url = ResourceAccessor.openWeatherIconsPath + "01d.svg"
         val result = SvgParser.getPath(url)
-        Truth.assertThat(result).isEqualTo(SVG_PATH_01d)
+        Truth.assertThat(result[0]).isEqualTo(SVG_PATH_01d)
     }
 
     companion object {
