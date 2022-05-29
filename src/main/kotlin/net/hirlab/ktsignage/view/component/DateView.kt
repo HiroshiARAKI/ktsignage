@@ -5,7 +5,6 @@
 package net.hirlab.ktsignage.view.component
 
 import javafx.scene.Group
-import javafx.scene.shape.SVGPath
 import javafx.scene.transform.Scale
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.style.Styles
@@ -30,14 +29,26 @@ class DateView : BaseView() {
         if (it.isValidTemp()) "min: $CELSIUS_FORMAT".format(it) else ""
     }
 
-    private var iconSvgPath: SVGPath? = null
+    private var iconSvgPathGroup: Group? = null
 
     private var lastScaling: Scale? = null
 
     init {
         viewModel.weatherIconSvg.onChange {
-            if (it == null || iconSvgPath == null) return@onChange
-            iconSvgPath!!.content = it
+            if (it == null) return@onChange
+            iconSvgPathGroup?.replaceChildren {
+                region {
+                    it.forEach {
+                        svgpath {
+                            content = it
+                            fillProperty().bind(viewModel.textColorProperty)
+                            strokeProperty().bind(viewModel.textColorProperty)
+                        }
+                    }
+                    scaleX = 0.2
+                    scaleY = 0.2
+                }
+            }
         }
         val container = vbox {
             addClass(Theme.openSansFont)
@@ -52,16 +63,8 @@ class DateView : BaseView() {
                     textFillProperty().bind(viewModel.textColorProperty)
                     style = Styles.city
                 }
-                group {
-                    iconSvgPath = svgpath {
-                        content = viewModel.weatherIconSvg.value ?: ""
-                        fillProperty().bind(viewModel.textColorProperty)
-                        strokeProperty().bind(viewModel.textColorProperty)
-                        scaleX = 0.2
-                        scaleY = 0.2
-                    }
-                }
-
+                // the contents are set when finished loading weather information.
+                iconSvgPathGroup = group { }
                 label(temp) {
                     textFillProperty().bind(viewModel.textColorProperty)
                     style = Styles.marginLeftRight

@@ -31,7 +31,7 @@ class DateViewModel : ViewModel() {
     val rootScaleProperty = SimpleDoubleProperty(DateViewSize.DEFAULT.value)
 
     val dateString = SimpleStringProperty("")
-    val weatherIconSvg = SimpleStringProperty()
+    val weatherIconSvg = SimpleObjectProperty<List<String>>()
     val tempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val maxTempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)
     val minTempFloat = SimpleFloatProperty(Weather.INVALID_TEMP)

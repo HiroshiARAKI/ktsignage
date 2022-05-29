@@ -25,7 +25,11 @@ class AppPreferencesDao : PreferencesDao {
     override suspend fun initialize() = withContext(Dispatchers.IO) {
         Setting.dateFormat = DateFormat.valueOfOrDefault(dataStore.getOrPut(DATE_FORMAT, DateFormat.DEFAULT.name))
         Setting.lang = Language.valueOfOrDefault(dataStore.getOrPut(LANGUAGE, Language.DEFAULT.name))
-        Setting.location = getLocation()
+        getLocation().let {
+            Setting.location = it
+            Setting.country = it.country
+            Setting.city = it.value
+        }
         Setting.imageTransition = ImageTransition.valueOfOrDefault(
             dataStore.getOrPut(IMAGE_TRANSITION, ImageTransition.DEFAULT.name)
         )

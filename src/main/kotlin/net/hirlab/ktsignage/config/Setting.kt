@@ -36,14 +36,16 @@ object Setting {
 
     var locale: Locale = Language.map[lang.code] ?: Locale.getDefault()
 
-    var country = Country.JP
+    var country = Country.DEFAULT
 
     var city = City(id=1848354, name="Yokohama-shi")
 
     var location = Location.from(country, city)
         set(value) {
             field = value
-            settingMap[Location::class] = value
+            settingMap[Country::class] = value.country
+            country = value.country
+            city = value.value
             synchronized(lock) { listeners.forEach { it.onLocationChanged(value) } }
             Logger.d("$TAG.location is changed to $value")
         }
@@ -105,7 +107,7 @@ object Setting {
 
     fun getDateTimeFormatter() = DateTimeFormatter.ofPattern(dateFormat.value, locale)
 
-    fun getLog() = "Config: DateFormat=$dateFormat, Lang=$lang, Location=$location"
+    fun getLog() = "Config: DateFormat=$dateFormat, Lang=$lang, Country=$country, city=$city."
 
     /**
      * Listener for setting changes.

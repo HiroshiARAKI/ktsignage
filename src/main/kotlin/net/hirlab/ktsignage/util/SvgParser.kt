@@ -18,14 +18,19 @@ object SvgParser {
     private const val X_PATH_EXPRESSION = "//path/@d"
 
     /**
-     * Gets (extracts) the path of SVG file.
+     * Gets (extracts) the paths of SVG file.
      */
-    suspend fun getPath(url: String): String = withContext(Dispatchers.IO) {
+    suspend fun getPath(url: String): List<String> = withContext(Dispatchers.IO) {
         DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(url).let { svgFile ->
             val svgPaths =
                 XPathFactory.newInstance().newXPath()
                     .compile(X_PATH_EXPRESSION).evaluate(svgFile, XPathConstants.NODESET) as NodeList
-            svgPaths.item(0).nodeValue
+            val size = svgPaths.length
+            val paths = mutableListOf<String>()
+            repeat(size) {
+                paths.add(svgPaths.item(it).nodeValue)
+            }
+            paths
         }
     }
 }
