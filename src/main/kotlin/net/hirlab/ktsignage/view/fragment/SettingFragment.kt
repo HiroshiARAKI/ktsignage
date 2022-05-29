@@ -114,8 +114,8 @@ class SettingFragment : Fragment(TITLE) {
                 combobox (values = settingValues) {
                     style = Styles.settingInput
                     converter = getConvertor<T>(type)
-                    Logger.d("type= $type")
                     value = Setting.settingMap[type] as T?
+                    Logger.d("type= $type, value=$value")
                     valueProperty().onChange {
                         if (it is Country) {
                             viewModel.loadCities(it)
