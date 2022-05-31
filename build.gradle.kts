@@ -4,7 +4,7 @@ plugins {
     application
 }
 group = "net.hirlab"
-version = "1.0-SNAPSHOT"
+version = "1.2.0"
 
 val tornadofxVersion = "1.7.20"
 val coroutinesVersion = "1.6.1"

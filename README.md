@@ -1,8 +1,6 @@
 # KtSignage
 ![code_size](https://img.shields.io/github/languages/code-size/HiroshiARAKI/ktsignage)
-![version](https://img.shields.io/badge/version-1.1.1-blue)
-
-This project is still in beta.
+![version](https://img.shields.io/badge/version-1.2.0-blue)
 
 KtSignage is a Simple smart display application worked on Kotlin.
 
