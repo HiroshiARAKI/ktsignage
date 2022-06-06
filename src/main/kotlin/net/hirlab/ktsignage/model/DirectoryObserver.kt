@@ -7,6 +7,7 @@ package net.hirlab.ktsignage.model
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.hirlab.ktsignage.util.Logger
+import net.hirlab.ktsignage.util.Platform
 import net.hirlab.ktsignage.util.runWithDelay
 import java.nio.file.FileSystems
 import java.nio.file.Paths
@@ -30,13 +31,15 @@ object DirectoryObserver {
      */
     suspend fun start(targetPath: String) = withContext(Dispatchers.IO) {
         Logger.d("$TAG.start(): start watching $targetPath changes.")
+        val adjustedPath =
+            if (Platform.isWindows()) targetPath.replaceFirst("^/(.:/)", "$1").drop(1) else targetPath
         val watcher = FileSystems.getDefault().newWatchService()
-        watcherMap[targetPath] = watcher
-        val watchKey = Paths.get(targetPath).register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY)
+        watcherMap[adjustedPath] = watcher
+        val watchKey = Paths.get(adjustedPath).register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY)
 
         runWithDelay(UPDATE_DELAY_MILLIS) {
             if (!watchKey.isValid) {
-                Logger.w("$TAG.start(): watch key is invalid. (path=$targetPath)")
+                Logger.w("$TAG.start(): watch key is invalid. (path=$adjustedPath)")
                 return@runWithDelay
             }
             try {
@@ -48,7 +51,7 @@ object DirectoryObserver {
                 }
                 watchKey.reset()
             } catch (e: InterruptedException) {
-                Logger.w("$TAG($targetPath): Error occurs. (message=${e.message})")
+                Logger.w("$TAG($adjustedPath): Error occurs. (message=${e.message})")
             }
         }
     }
