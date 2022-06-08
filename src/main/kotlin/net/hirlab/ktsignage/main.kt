@@ -6,6 +6,6 @@ package net.hirlab.ktsignage
 
 import tornadofx.launch
 
-fun main() {
-    launch<MyApp>()
+fun main(args: Array<String>) {
+    launch<MyApp>(args)
 }

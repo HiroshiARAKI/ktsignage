@@ -17,6 +17,7 @@ import net.hirlab.ktsignage.view.MainView
 import tornadofx.App
 import tornadofx.DIContainer
 import tornadofx.FX
+import java.io.File
 import kotlin.reflect.KClass
 
 class MyApp: App(MainView::class, Theme::class) {
@@ -29,7 +30,8 @@ class MyApp: App(MainView::class, Theme::class) {
     }
 
     override fun start(stage: Stage) {
-        val icon = Image(ResourceAccessor.iconURL.toExternalForm())
+        createPreferencesDirectory()
+        val icon = Image(ResourceAccessor.iconPath)
         stage.icons.add(icon)
         super.start(stage)
     }
@@ -37,6 +39,11 @@ class MyApp: App(MainView::class, Theme::class) {
     override fun stop() {
         super.stop()
         applicationScope.cancel()
+    }
+
+    private fun createPreferencesDirectory() {
+        val preferencesDir = ResourceAccessor.userHome + File.separator + ".ktsignage" + File.separator + "data"
+        File(preferencesDir).mkdirs()
     }
 
     companion object {

@@ -38,7 +38,7 @@ fun preferencesDataStore() = DataStore("preferences")
  */
 class DataStore(private val name: String) {
     private val tag = "${this::class.java.simpleName}($name)"
-    private val preferencesPath = ResourceAccessor.dataPath + name + ".xml"
+    private val preferencesPath = ResourceAccessor.localDataPath + name + ".xml"
     private val preferencesFile: File
         get() = File(preferencesPath)
     private val xPath = XPathFactory.newInstance().newXPath()

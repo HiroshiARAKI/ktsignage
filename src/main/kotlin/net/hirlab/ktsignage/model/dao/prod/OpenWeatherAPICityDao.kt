@@ -13,7 +13,8 @@ import net.hirlab.ktsignage.model.dao.CityDao
 import net.hirlab.ktsignage.model.data.City
 import net.hirlab.ktsignage.util.Logger
 import org.json.JSONObject
-import java.io.File
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * Data access object of [City] that can be used on OpenWeather API.
@@ -25,8 +26,12 @@ class OpenWeatherAPICityDao : CityDao {
     private lateinit var  cityJson: JSONObject
 
     private val initializingJob: Job = applicationScope.launch(Dispatchers.IO) {
-        val raw = File(ResourceAccessor.dataPath + "city.json").readText()
-        cityJson = JSONObject(raw)
+        val inputStream = ResourceAccessor.cityDataPath
+        val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
+        StringBuilder().let { builder ->
+            reader.readLines().forEach { builder.append(it) }
+            cityJson = JSONObject(builder.toString())
+        }
     }
 
     override suspend fun getCities(countryCode: String): List<City>? {
