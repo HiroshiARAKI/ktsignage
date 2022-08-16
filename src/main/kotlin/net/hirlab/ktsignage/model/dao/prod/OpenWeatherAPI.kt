@@ -28,24 +28,14 @@ class OpenWeatherAPI : WeatherDao {
 
         val url = "$URL_CURRENT_WEATHER?id=${Setting.location.value.id}" +
                 "&lang=${Setting.lang.code}&appid=${Setting.openWeatherAPIKey}"
-        try {
-            requestTo(url) { response ->
-                if (!response.isSuccessful) {
-                    Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-                    val message = if (Setting.city.id == City.INVALID_CITY_ID) {
-                        "Set your location at first."
-                    } else {
-                        "${response.code}: ${response.message}"
-                    }
-                    WeatherDao.Status.setStatus(false, message)
-                    return@requestTo null
-                }
-                WeatherDao.Status.setStatus(true, "Valid API Key!")
-                JSONObject(response.body!!.string()).toWeather()
+        requestTo(url) { response ->
+            if (!response.isSuccessful) {
+                Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
+                WeatherDao.Status.setStatus(false, createMessageFrom(response))
+                return@requestTo null
             }
-        } catch (e: UnknownHostException) {
-            Logger.w("getCurrentWeather() is failed because caught UnknownHostException (${e.message}).")
-            return@withContext null
+            WeatherDao.Status.setStatus(true, "Valid API Key!")
+            JSONObject(response.body!!.string()).toWeather()
         }
     }
 
@@ -56,20 +46,30 @@ class OpenWeatherAPI : WeatherDao {
                 "&lang=${Setting.lang.code}&appid=${Setting.openWeatherAPIKey}"
        requestTo(url) { response ->
            if (!response.isSuccessful) {
-               Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-               WeatherDao.Status.setStatus(false, "Invalid API Key.")
-               // TODO: Handle error messages of OpenWeather API (#2)
+               Logger.w("get5DaysWeather() is failed. (code=${response.code}, message=${response.message})")
+               WeatherDao.Status.setStatus(false, createMessageFrom(response))
                return@requestTo emptyList()
            }
            WeatherDao.Status.setStatus(true, "Valid API Key!")
            JSONObject(response.body!!.string()).to5DaysWeatherList()
-       }
+       } ?: emptyList()
     }
 
-    private fun <T> requestTo(url: String, body: (Response) -> T): T {
-        return client.newCall(Request.Builder().url(url).build()).execute().let { response ->
-            response.use { body(it) }
+    private fun <T> requestTo(url: String, body: (Response) -> T): T? {
+        return try {
+            client.newCall(Request.Builder().url(url).build()).execute().let { response ->
+                response.use { body(it) }
+            }
+        } catch (e: UnknownHostException) {
+            Logger.w("getCurrentWeather() is failed because caught UnknownHostException (${e.message}).")
+            return null
         }
+    }
+
+    private fun createMessageFrom(response: Response) = if (Setting.city.id == City.INVALID_CITY_ID) {
+        "Set your location at first."
+    } else {
+        "${response.code}: ${response.message}"
     }
 
     companion object {
