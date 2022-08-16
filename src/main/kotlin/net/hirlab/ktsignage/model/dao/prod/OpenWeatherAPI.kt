@@ -17,6 +17,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import java.net.UnknownHostException
 
 @Singleton
 class OpenWeatherAPI : WeatherDao {
@@ -27,20 +28,24 @@ class OpenWeatherAPI : WeatherDao {
 
         val url = "$URL_CURRENT_WEATHER?id=${Setting.location.value.id}" +
                 "&lang=${Setting.lang.code}&appid=${Setting.openWeatherAPIKey}"
-        requestTo(url) { response ->
-            if (!response.isSuccessful) {
-                Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-                val message = if (Setting.city.id == City.INVALID_CITY_ID) {
-                    "Set your location at first."
-                } else {
-                    "${response.code}: ${response.message}"
+        try {
+            requestTo(url) { response ->
+                if (!response.isSuccessful) {
+                    Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
+                    val message = if (Setting.city.id == City.INVALID_CITY_ID) {
+                        "Set your location at first."
+                    } else {
+                        "${response.code}: ${response.message}"
+                    }
+                    WeatherDao.Status.setStatus(false, message)
+                    return@requestTo null
                 }
-                WeatherDao.Status.setStatus(false, message)
-                // TODO: Handle error messages of OpenWeather API (#2)
-                return@requestTo null
+                WeatherDao.Status.setStatus(true, "Valid API Key!")
+                JSONObject(response.body!!.string()).toWeather()
             }
-            WeatherDao.Status.setStatus(true, "Valid API Key!")
-            JSONObject(response.body!!.string()).toWeather()
+        } catch (e: UnknownHostException) {
+            Logger.w("getCurrentWeather() is failed because caught UnknownHostException (${e.message}).")
+            return@withContext null
         }
     }
 
