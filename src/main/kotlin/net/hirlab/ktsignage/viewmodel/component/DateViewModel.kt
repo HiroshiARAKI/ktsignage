@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleFloatProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Paint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -46,16 +47,12 @@ class DateViewModel : ViewModel() {
 
     private val configListener = object : Setting.Listener {
         override fun onLanguageChanged(language: Language) {
-            viewModelScope.launch {
-                dbAccessQueue.send { loadCurrentWeather() }
-            }
+            restartWeatherLoading()
             formatter = Setting.getDateTimeFormatter()
         }
 
         override fun onLocationChanged(location: Location) {
-            viewModelScope.launch {
-                dbAccessQueue.send { loadCurrentWeather() }
-            }
+            restartWeatherLoading()
             formatter = Setting.getDateTimeFormatter()
         }
 
@@ -64,9 +61,7 @@ class DateViewModel : ViewModel() {
         }
 
         override fun onOpenWeatherAPIKeyChanged(apiKey: OpenWeatherApiKey) {
-            viewModelScope.launch {
-                dbAccessQueue.send { loadCurrentWeather() }
-            }
+            restartWeatherLoading()
         }
 
         override fun onImageDirectoryChanged(directory: ImageDirectory) {
@@ -97,6 +92,8 @@ class DateViewModel : ViewModel() {
         }
     }
 
+    private var weatherLoadingJob: Job? = null
+
     init {
         Setting.addListener(configListener)
         viewModelScope.launch {
@@ -106,16 +103,21 @@ class DateViewModel : ViewModel() {
                 }
             }
         }
-        viewModelScope.launch {
-            runWithDelay(WEATHER_UPDATE_DELAY_MILLIS) {
-                dbAccessQueue.send { loadCurrentWeather() }
-            }
-        }
+        restartWeatherLoading()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Setting.removeListener(configListener)
+    }
+
+    private fun restartWeatherLoading() {
+        weatherLoadingJob?.cancel()
+        weatherLoadingJob = viewModelScope.launch {
+            runWithDelay(WEATHER_UPDATE_DELAY_MILLIS) {
+                dbAccessQueue.send { loadCurrentWeather() }
+            }
+        }
     }
 
     private suspend fun loadCurrentWeather() {
