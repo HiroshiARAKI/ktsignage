@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.dao.WeatherDao
+import net.hirlab.ktsignage.model.data.City
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.util.Logger
 import okhttp3.OkHttpClient
@@ -29,7 +30,12 @@ class OpenWeatherAPI : WeatherDao {
         requestTo(url) { response ->
             if (!response.isSuccessful) {
                 Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-                WeatherDao.Status.setStatus(false, "Invalid API Key.")
+                val message = if (Setting.city.id == City.INVALID_CITY_ID) {
+                    "Set your location at first."
+                } else {
+                    "${response.code}: ${response.message}"
+                }
+                WeatherDao.Status.setStatus(false, message)
                 // TODO: Handle error messages of OpenWeather API (#2)
                 return@requestTo null
             }
@@ -57,7 +63,7 @@ class OpenWeatherAPI : WeatherDao {
 
     private fun <T> requestTo(url: String, body: (Response) -> T): T {
         return client.newCall(Request.Builder().url(url).build()).execute().let { response ->
-            body(response)
+            response.use { body(it) }
         }
     }
 

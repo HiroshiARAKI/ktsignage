@@ -14,7 +14,11 @@ import javafx.util.StringConverter
 data class City(
     val id: Int,
     val name: String,
-)
+) {
+    companion object {
+        const val INVALID_CITY_ID = -1
+    }
+}
 
 fun cityStringConvertor(cityNameToId: Map<String, Int>) = object : StringConverter<City>() {
     override fun toString(item: City?): String {
