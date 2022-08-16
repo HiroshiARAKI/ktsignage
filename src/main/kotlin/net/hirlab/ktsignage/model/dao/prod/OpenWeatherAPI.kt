@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.hirlab.ktsignage.config.Setting
 import net.hirlab.ktsignage.model.dao.WeatherDao
+import net.hirlab.ktsignage.model.data.City
 import net.hirlab.ktsignage.model.data.Weather
 import net.hirlab.ktsignage.util.Logger
 import okhttp3.OkHttpClient
@@ -16,6 +17,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import java.net.UnknownHostException
 
 @Singleton
 class OpenWeatherAPI : WeatherDao {
@@ -29,8 +31,7 @@ class OpenWeatherAPI : WeatherDao {
         requestTo(url) { response ->
             if (!response.isSuccessful) {
                 Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-                WeatherDao.Status.setStatus(false, "Invalid API Key.")
-                // TODO: Handle error messages of OpenWeather API (#2)
+                WeatherDao.Status.setStatus(false, createMessageFrom(response))
                 return@requestTo null
             }
             WeatherDao.Status.setStatus(true, "Valid API Key!")
@@ -45,20 +46,30 @@ class OpenWeatherAPI : WeatherDao {
                 "&lang=${Setting.lang.code}&appid=${Setting.openWeatherAPIKey}"
        requestTo(url) { response ->
            if (!response.isSuccessful) {
-               Logger.w("getCurrentWeather() is failed. (code=${response.code}, message=${response.message})")
-               WeatherDao.Status.setStatus(false, "Invalid API Key.")
-               // TODO: Handle error messages of OpenWeather API (#2)
+               Logger.w("get5DaysWeather() is failed. (code=${response.code}, message=${response.message})")
+               WeatherDao.Status.setStatus(false, createMessageFrom(response))
                return@requestTo emptyList()
            }
            WeatherDao.Status.setStatus(true, "Valid API Key!")
            JSONObject(response.body!!.string()).to5DaysWeatherList()
-       }
+       } ?: emptyList()
     }
 
-    private fun <T> requestTo(url: String, body: (Response) -> T): T {
-        return client.newCall(Request.Builder().url(url).build()).execute().let { response ->
-            body(response)
+    private fun <T> requestTo(url: String, body: (Response) -> T): T? {
+        return try {
+            client.newCall(Request.Builder().url(url).build()).execute().let { response ->
+                response.use { body(it) }
+            }
+        } catch (e: UnknownHostException) {
+            Logger.w("getCurrentWeather() is failed because caught UnknownHostException (${e.message}).")
+            return null
         }
+    }
+
+    private fun createMessageFrom(response: Response) = if (Setting.city.id == City.INVALID_CITY_ID) {
+        "Set your location at first."
+    } else {
+        "${response.code}: ${response.message}"
     }
 
     companion object {

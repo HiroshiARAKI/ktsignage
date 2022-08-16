@@ -96,7 +96,7 @@ class AppPreferencesDao : PreferencesDao {
     private fun getLocation(): Location {
         val country = Country.valueOfOrDefault(dataStore.getOrPut(COUNTRY, Country.DEFAULT.name))
         val city = City(
-            dataStore.getOrPut(CITY_ID, "-1").toInt(),
+            dataStore.getOrPut(CITY_ID, "${City.INVALID_CITY_ID}").toInt(),
             dataStore.getOrPut(CITY_NAME, ""),
         )
         return Location.from(country, city)
